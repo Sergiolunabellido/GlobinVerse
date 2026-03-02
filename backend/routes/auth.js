@@ -6,7 +6,7 @@ const { refreshAccessToken } = require('../controllers/refreshTokenController')
 const {listarUsuariosId, cerrarSesion} = require('../controllers/usersController')
 const {libros,libroId,librosCompletos,librosFavoritosUser, librosCompradosUser, eliminarFavoritoPorId, librosFiltradosGenero} = require('../controllers/librosController')
 const authMiddleware = require( '../middleware/auth.middleware');
-
+const {añadirLibroCarrito} = require('../controllers/cartController')
 const router = express.Router();
 
 // El login no debe ir protegido con el middleware de auth,
@@ -24,5 +24,6 @@ router.post('/cerrarSesion', cerrarSesion )
 router.post('/librosPublicos', libros)
 router.post('/libroId', libroId)
 router.post('/librosFiltrados', librosFiltradosGenero)
+router.post('/anadirLibroCarrito', authMiddleware ,añadirLibroCarrito)
 
 module.exports = router;

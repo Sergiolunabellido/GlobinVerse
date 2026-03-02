@@ -31,6 +31,27 @@ export default function PageBook(){
     const { state } = useLocation();
     const [libro, setLibro] = useState(state?.libro || null);
    
+    function añadirLibroCarrito(){
+            fetch(`http://localhost:5000/anadirLibroCarrito`,{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({ id_libro: id }),
+            })
+            .then((r) => r.json())
+            .then(data => {
+                if (data.ok) {
+                    alert("El libro se ha añadido al carrito correctamente");
+                } else {
+                    alert(data.mensaje || "Ya existe este libro en tu carrito");
+                }
+            })
+            .catch((error) => {
+                console.error("Error al añadir al carrito:", error.message);
+            });
+    }
 
 
     useEffect(() => {
@@ -91,7 +112,7 @@ export default function PageBook(){
                         </div>
                         
 
-                        <button id="botonCarrito" className="flex items-center justify-center font-bold text-black bg-[#22C55E] text-xl w-[28%] rounded-lg h-[4rem]"> Añadir al carrito</button>
+                        <button id="botonCarrito" className="flex items-center justify-center font-bold text-black bg-[#22C55E] text-xl w-[28%] rounded-lg h-[4rem]" onClick={añadirLibroCarrito}> Añadir al carrito</button>
                         <button id="botonCompra" className="flex items-center justify-center font-bold text-black bg-[#22C55E] text-1xl w-[28%] rounded-lg h-[4rem]">Comprar Libro</button>
                     </div>
                     <div id="descripcion" className="flex flex-col items-start text-justify w-[70%] mt-6 mb-5 gap-5">
@@ -131,3 +152,7 @@ export default function PageBook(){
         </div>
     )
 }
+
+
+
+
