@@ -1,10 +1,12 @@
 
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useEffect, useState} from 'react';
 
 export default function Header() {
     const [estaLogueado, setEstaLogueado] = useState();
     const navigate = useNavigate();
+    const location = useLocation();
+    const mostrarBuscador = location.pathname === '/catalogo';
 
    
 
@@ -56,12 +58,12 @@ export default function Header() {
                         </nav>
 
                         <div className=" flex items-center justify-center  ml-auto m-1">
-                            <form >
-
-                                <input type="text" name="q" placeholder="Buscar por nombre, categoria, etc..."
-                                       className="px-2 py-1 rounded bg-white text-black  md:flex  hidden"/>
-
-                            </form>
+                            {mostrarBuscador && (
+                                <form>
+                                    <input type="text" name="q" placeholder="Buscar por nombre, categoria, etc..."
+                                           className="px-2 py-1 rounded bg-white text-black  md:flex  hidden"/>
+                                </form>
+                            )}
                             <button type="button" className="bg-gray-400 p-1 rounded ml-1 bg-opacity-50">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"
