@@ -4,7 +4,6 @@ import generosArray from '../../Services/funtionGenres.js';
 import {useNavigate} from "react-router-dom";
 import Header from '../../Components/Header/header.jsx';
 import Footer from '../../Components/Footer/footer.jsx';
-import { renovarToken } from "../../utils/utils";
 import { Canvas } from "@react-three/fiber";
 import {Libro3D} from '../../utils/utils'
 import { OrbitControls } from "@react-three/drei";

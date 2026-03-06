@@ -125,7 +125,7 @@ export default function Catalogo(){
 
     return (
         <div className='body1 overflow-x-hidden flex flex-col w-screen min-h-screen bg-[#102216] items-center'>
-            <Header />
+            <Header  onSearchChange={filtradoTitulo}/>
             <hr className="border-gray-700 border-solid w-[100%] m-[1rem] sm:w-800px opacity-50"/>
             <div className='flex w-[100%] ms-[40%] sm:m-3 justify-center'>
                 <div className='flex flex-col items-start bg-white/5 w-[15%] h-[25rem] hidden md:flex rounded-xl p-5 m-5'>

@@ -19,6 +19,6 @@ module.exports = (req, res, next) => {
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expirado" });
     }
-    return res.status(401).json({ message: "Token inválido" });
+    return res.status(401).json({ message: "Token inválido, Debes iniciar sesion." });
   }
 };

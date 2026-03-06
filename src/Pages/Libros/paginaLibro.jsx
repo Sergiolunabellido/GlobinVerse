@@ -1,5 +1,6 @@
 import { useParams, useLocation } from "react-router-dom";
 import { useEffect, useState, Suspense } from "react";
+import toast from 'react-hot-toast';
 import Header from "../../Components/Header/header";
 import { Canvas } from "@react-three/fiber";
 import {Libro3D} from '../../utils/utils'
@@ -40,12 +41,18 @@ export default function PageBook(){
                 },
                 body: JSON.stringify({ id_libro: id }),
             })
-            .then((r) => r.json())
+            .then((r) => {
+                if(r.status === 401){
+                    toast.error("Debes iniciar sesion primero.");
+                    throw new Error("AUTH_REQUIRED")
+                }
+                return r.json()
+            })
             .then(data => {
                 if (data.ok) {
-                    alert("El libro se ha añadido al carrito correctamente");
+                    toast.success("El libro se ha añadido al carrito correctamente");
                 } else {
-                    alert(data.mensaje || "Ya existe este libro en tu carrito");
+                    toast.error(data.mensaje || "Ya existe este libro en tu carrito");
                 }
             })
             .catch((error) => {

@@ -1,4 +1,5 @@
-import { Suspense, useState, useEffect } from "react"
+import { Suspense, useState, useEffect, useCallback } from "react"
+import toast from 'react-hot-toast';
 import { renovarToken } from "../../utils/utils";
 import { useNavigate } from "react-router-dom";
 import { Canvas } from "@react-three/fiber";
@@ -35,8 +36,7 @@ export default function MiPerfil(){
     };
 
     const eliminarFavorito = async (idFavorito) => {
-        // aquí tu fetch al backend para borrar favorito
-        // await fetch("http://localhost:5000/eliminarFavorito", {...})
+    
         let respuesta = await fetch("http://localhost:5000/eliminarLibro",{
                 method: 'POST',
                 headers: {
@@ -49,7 +49,7 @@ export default function MiPerfil(){
 
             const datos = await respuesta.json();
             if(datos.ok ){
-                alert("Se a eliminado el libro de favoritos")
+                toast.success("Se ha eliminado el libro de favoritos")
                 setLibrosFavoritos((prev) => prev.filter((l) => l.id_libro !== idFavorito));
                 cerrarMenuContextual();
                 await obtenerLibros()
@@ -61,7 +61,8 @@ export default function MiPerfil(){
 
 
 
-    const obtenerUsuario = async () =>{
+    const obtenerUsuario = useCallback(
+        async () =>{
     
         try{
             let respuesta = await fetch("http://localhost:5000/usuarios",{
@@ -79,7 +80,7 @@ export default function MiPerfil(){
                 if(!tokenRenovado){
                     localStorage.removeItem('token');
                     navigate('/login')
-                    alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+                    toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
                     return;
                 }
 
@@ -104,9 +105,10 @@ export default function MiPerfil(){
             console.error("Error al pedir los datos del usuario:  ", e)
         }
         
-    };
+    },[navigate]) 
 
-    const obtenerLibros = async () =>{
+    const obtenerLibros = useCallback(
+        async () =>{
         try{
             let respuesta = await fetch("http://localhost:5000/librosFavoritos",{
                 method: 'POST',
@@ -134,7 +136,6 @@ export default function MiPerfil(){
                     },
                     credentials: 'include'
                 });
-
             }
     
             const datos = await respuesta.json();
@@ -161,9 +162,10 @@ export default function MiPerfil(){
         }catch(e){
             console.error("Error al pedir los datos de los libros:  ", e)
         }
-    }
+    },[navigate]) 
 
-    const obtenerComprados = async () =>{
+    const obtenerComprados = useCallback(
+        async () =>{
         try{
             let respuesta = await fetch("http://localhost:5000/librosComprados",{
                 method: 'POST',
@@ -205,7 +207,7 @@ export default function MiPerfil(){
             setLibrosComprados(0);
             console.error("Error al pedir los datos de los libros:  ", e)
         }
-    }
+    },[navigate]) 
 
     useEffect(() =>{
         obtenerUsuario();

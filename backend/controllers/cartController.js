@@ -36,7 +36,6 @@ async function añadirLibroCarrito(req, res){
     }catch(e){
         console.log("Error al insertar el libro en el carrito del usuario: ", req.id_usuario)
         return res.status(500).json({ ok: false, mensaje: "Error al añadir el libro al carrito" });
-        throw e;
     } finally {
         if (conexion) await conexion.end();
     }
