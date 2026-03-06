@@ -14,6 +14,9 @@ export default function Header({ onSearchChange }) {
     const handleClickPerfil = () =>{
         navigate('/perfil')
     }
+    const handleClickCarrito = () =>{
+        navigate('/carrito')
+    }
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -62,7 +65,7 @@ export default function Header({ onSearchChange }) {
                                            className="px-2 py-1 rounded bg-white text-black  md:flex  hidden"/>
                                 </form>
                             )}
-                            <button type="button" className="bg-gray-400 p-1 rounded ml-1 bg-opacity-50">
+                            <button type="button" className="bg-gray-400 p-1 rounded ml-1 bg-opacity-50" onClick={handleClickCarrito}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                      stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"
                                      className="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">

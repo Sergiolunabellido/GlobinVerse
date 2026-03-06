@@ -61,31 +61,33 @@ export default function Catalogo(){
     };
 
 
-     const filtradoTitulo = async () =>{
-    
+     const filtradoTitulo = async (titulo) =>{
+
+        if (!titulo || titulo.trim() === '') {
+            obtenerLibros();
+            return;
+        }
+
         try{
-
-
             let respuesta = await fetch("http://localhost:5000/libroTitulo",{
                 method: 'POST',
                 headers: {
-                    "Content-type": 'application/json', 
+                    "Content-type": 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                credentials : 'include'
+                credentials : 'include',
+                body: JSON.stringify({ titulo_libro: titulo })
             });
 
-        
-    
             const datos = await respuesta.json();
             if(datos.ok && datos.filas.length > 0){
                 setLibros(datos.filas);
             }
-            
+
         }catch(e){
-            console.error("Error al pedir los datos del usuario:  ", e)
+            console.error("Error al filtrar por titulo:  ", e)
         }
-        
+
     };
     
 
@@ -125,7 +127,7 @@ export default function Catalogo(){
 
     return (
         <div className='body1 overflow-x-hidden flex flex-col w-screen min-h-screen bg-[#102216] items-center'>
-            <Header  onSearchChange={filtradoTitulo}/>
+            <Header onSearchChange={(e) => filtradoTitulo(e.target.value)}/>
             <hr className="border-gray-700 border-solid w-[100%] m-[1rem] sm:w-800px opacity-50"/>
             <div className='flex w-[100%] ms-[40%] sm:m-3 justify-center'>
                 <div className='flex flex-col items-start bg-white/5 w-[15%] h-[25rem] hidden md:flex rounded-xl p-5 m-5'>

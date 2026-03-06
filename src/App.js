@@ -6,6 +6,7 @@ import Login from './Pages/Login/login';
 import PageBook from './Pages/Libros/paginaLibro';
 import Perfil from './Pages/Perfil/perfil'
 import Catalogo from './Pages/Catalogo/catalogo';
+import Carrito from './Pages/Carrito/carrito';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/libro/:id" element={<PageBook />} />
         <Route path="/catalogo" element={<Catalogo />} />
+        <Route path="/carrito" element={<Carrito />} />
       </Routes>
     </div>
   );

@@ -75,15 +75,15 @@ async function libroId(req, res) {
 
 async function libroTitulo(req, res) {
     let conexion;
-    let {nombre_libro} = req.body;
+    let {titulo_libro} = req.body;
     try {
         conexion = await conexionBD();
-        const [filas] = await conexion.execute('SELECT * FROM libros where LOWER(titulo) LIKE LOWER(?)', [`%${nombre_libro}%`]);
+        const [filas] = await conexion.execute('SELECT * FROM libros where LOWER(titulo) LIKE LOWER(?)', [`%${titulo_libro}%`]);
 
         if(filas.length === 0){
             return res.status(404).json({
                 ok: false,
-                mensaje: `No se han encontrado el libro con titulo: ${nombre_libro} en la base de datos`
+                mensaje: `No se han encontrado el libro con titulo: ${titulo_libro} en la base de datos`
             })
             
         }
