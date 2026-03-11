@@ -180,6 +180,52 @@ async function librosFavoritosUser(req, res) {
     }
 }
 
+async function anadirFavorito(req, res){
+    const id_usuario = req.id_usuario;
+    const id_libro = req.body.id_libro;
+
+    if (!id_libro) {
+        return res.status(400).json({
+            ok: false,
+            mensaje: "Id de libro requerido"
+        });
+    }
+
+    let conexion;
+    try{
+        conexion = await conexionBD();
+        const [existe] = await conexion.execute(
+            'SELECT id_favorito FROM favoritos WHERE id_user = ? AND id_libro = ? LIMIT 1',
+            [id_usuario, id_libro]
+        );
+
+        if (existe.length > 0) {
+            return res.status(200).json({
+                ok: true,
+                mensaje: "El libro ya estaba en favoritos"
+            });
+        }
+
+        const [resultado] = await conexion.execute(
+            'INSERT INTO favoritos (id_user, id_libro) VALUES (?, ?)',
+            [id_usuario, id_libro]
+        );
+
+        return res.status(200).json({
+            ok: true,
+            resultado
+        });
+    }catch(e){
+        console.error('Error al añadir favorito:', e);
+        return res.status(500).json({
+            ok: false,
+            mensaje: "Error interno del servidor"
+        });
+    } finally {
+        if (conexion) await conexion.end();
+    }
+}
+
 async function eliminarFavoritoPorId(req,res) {
     const id_favorito = req.body.idFavorito
     let conexion;
@@ -269,6 +315,7 @@ async function librosFiltradosGenero(req, res) {
 
 
 module.exports= {
+    anadirFavorito,
     librosFavoritosUser,
     libros,
     crearLibro,

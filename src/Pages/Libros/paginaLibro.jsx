@@ -31,6 +31,7 @@ export default function PageBook(){
     const { id } = useParams();
     const { state } = useLocation();
     const [libro, setLibro] = useState(state?.libro || null);
+    const [esFavorito, setEsFavorito] = useState(false);
    
     function añadirLibroCarrito(){
             fetch(`http://localhost:5000/anadirLibroCarrito`,{
@@ -59,8 +60,61 @@ export default function PageBook(){
                 console.error("Error al añadir al carrito:", error.message);
             });
     }
+    const comprobarFavorito = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        try{
+            const r = await fetch("http://localhost:5000/librosFavoritos",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (r.status === 401) return;
+            const data = await r.json();
+            if (data.ok && Array.isArray(data.filas)) {
+                const existe = data.filas.some((f) => String(f.id_libro) === String(id));
+                setEsFavorito(existe);
+            } else {
+                setEsFavorito(false);
+            }
+        }catch(e){
+            setEsFavorito(false);
+        }
+    }
 
-
+    const anadirFavorito = async () => {
+        if (esFavorito) return;
+        const token = localStorage.getItem("token");
+        if (!token) {
+            toast.error("Debes iniciar sesion primero.");
+            return;
+        }
+        try{
+            const r = await fetch("http://localhost:5000/anadirFavorito",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ id_libro: id }),
+            });
+            if (r.status === 401) {
+                toast.error("Debes iniciar sesion primero.");
+                return;
+            }
+            const data = await r.json();
+            if (data.ok) {
+                setEsFavorito(true);
+                toast.success("Añadido a favoritos");
+            } else {
+                toast.error(data.mensaje || "No se pudo añadir a favoritos");
+            }
+        }catch(e){
+            toast.error("Error al añadir a favoritos");
+        }
+    }
     useEffect(() => {
         if(!libro){
             fetch(`http://localhost:5000/libroId`,{
@@ -73,6 +127,7 @@ export default function PageBook(){
                 if (data.ok && data.filas?.length) setLibro(data.filas[0]);
             });
         }
+        comprobarFavorito();
     },[id,libro])
 
     if (!libro) return <p>Cargando...</p>;
@@ -88,7 +143,25 @@ export default function PageBook(){
 
             <div className="flex flex-col items-center text-center gap-6 w-full px-4 sm:flex-row sm:items-start sm:text-left sm:gap-3 sm:px-0 mt-6">
                 <div id="divPortadaLibro" className="w-full sm:w-[40%] flex items-center justify-center">
-                    <div className="w-full max-w-[22rem] sm:max-w-[30rem] lg:max-w-[34rem] h-[22rem] sm:h-[28rem] lg:h-[34rem]">
+                    <div className="w-full max-w-[22rem] sm:max-w-[30rem] lg:max-w-[34rem] h-[22rem] sm:h-[28rem] lg:h-[34rem] relative">
+                        <button
+                            type="button"
+                            onClick={anadirFavorito}
+                            aria-label="AÃ±adir a favoritos"
+                            className="absolute top-3 right-3 z-10 p-2 rounded-full bg-[#1B3120]/80 hover:bg-[#1B3120] text-[#22C55E]"
+                        >
+                            {esFavorito ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-star">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-star">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873l-6.158 -3.245" />
+                                </svg>
+                            )}
+                        </button>
                         <Canvas
                             className="w-full h-full rounded-[10px] overflow-hidden"
                             frameloop="demand"
@@ -159,6 +232,7 @@ export default function PageBook(){
         </div>
     )
 }
+
 
 
 

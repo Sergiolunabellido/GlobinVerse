@@ -4,9 +4,9 @@ const { comprobarLogin } = require('../controllers/authController');
 const { registrarUsuario } = require('../controllers/registerController');
 const { refreshAccessToken } = require('../controllers/refreshTokenController')
 const {listarUsuariosId, cerrarSesion} = require('../controllers/usersController')
-const {libros, libroId, libroTitulo, librosCompletos,librosFavoritosUser, librosCompradosUser, eliminarFavoritoPorId, librosFiltradosGenero} = require('../controllers/librosController')
+const {libros, libroId, libroTitulo, librosCompletos,librosFavoritosUser, librosCompradosUser, eliminarFavoritoPorId, librosFiltradosGenero, anadirFavorito} = require('../controllers/librosController')
 const authMiddleware = require( '../middleware/auth.middleware');
-const {añadirLibroCarrito, librosCarrito} = require('../controllers/cartController')
+const {añadirLibroCarrito, librosCarrito, eliminarLibroCarrito} = require('../controllers/cartController')
 const router = express.Router();
 
 // El login no debe ir protegido con el middleware de auth,
@@ -17,6 +17,7 @@ router.post('/register', registrarUsuario);
 router.post('/refresh', refreshAccessToken); 
 router.post('/usuarios',authMiddleware, listarUsuariosId )
 router.post('/librosFavoritos', authMiddleware, librosFavoritosUser)
+router.post('/anadirFavorito', authMiddleware, anadirFavorito)
 router.post('/librosComprados', authMiddleware, librosCompradosUser)
 router.post('/libros', librosCompletos)
 router.post('/eliminarLibro', authMiddleware, eliminarFavoritoPorId)
@@ -27,5 +28,8 @@ router.post('/libroTitulo', libroTitulo)
 router.post('/librosFiltrados', librosFiltradosGenero)
 router.post('/anadirLibroCarrito', authMiddleware ,añadirLibroCarrito)
 router.post('/librosCarrito', authMiddleware ,librosCarrito)
+router.post('/eliminarLibroCarrito', authMiddleware ,eliminarLibroCarrito)
 
 module.exports = router;
+
+

@@ -81,7 +81,34 @@ async function librosCarrito(req, res) {
 
 }
 
+async function eliminarLibroCarrito(req, res){
+    const idLibro = req.body.id_libro;
+    const idUsuario = req.id_usuario;
+
+    if (!idLibro) {
+        return res.status(400).json({ ok: false, mensaje: "Id de libro requerido" });
+    }
+
+    let conexion;
+
+    try{
+        conexion = await conexionBD();
+        const [resultado] = await conexion.execute(
+            "DELETE FROM carrito WHERE id_user = ? AND id_libro = ?",
+            [idUsuario, idLibro]
+        );
+
+        return res.status(200).json({ ok: true, resultado });
+    }catch(e){
+        console.log("Error al eliminar el libro del carrito del usuario: ", req.id_usuario)
+        return res.status(500).json({ ok: false, mensaje: "Error al eliminar el libro del carrito" });
+    } finally {
+        if (conexion) await conexion.end();
+    }
+}
 module.exports={
     añadirLibroCarrito,
-    librosCarrito
+    librosCarrito,
+    eliminarLibroCarrito
 }
+

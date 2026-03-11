@@ -6,6 +6,8 @@ import { OrbitControls } from "@react-three/drei";
 import { Suspense, useState, useEffect } from "react"
 import {useNavigate} from "react-router-dom";
 
+
+
 const LIBROS_POR_PAGINA = 12;
 
 export default function Catalogo(){
@@ -42,12 +44,9 @@ export default function Catalogo(){
                 method: 'POST',
                 headers: {
                     "Content-type": 'application/json', 
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                credentials : 'include'
+                }
             });
 
-        
     
             const datos = await respuesta.json();
             if(datos.ok && datos.filas.length > 0){
@@ -73,12 +72,12 @@ export default function Catalogo(){
                 method: 'POST',
                 headers: {
                     "Content-type": 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    
                 },
-                credentials : 'include',
                 body: JSON.stringify({ titulo_libro: titulo })
             });
 
+           
             const datos = await respuesta.json();
             if(datos.ok && datos.filas.length > 0){
                 setLibros(datos.filas);
