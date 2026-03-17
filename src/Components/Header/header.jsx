@@ -47,6 +47,16 @@ export default function Header({ onSearchChange }) {
     }
 
     /**
+     * @brief Abre la pagina de contacto.
+     * @fecha 2026-01-09
+     * @returns {void} No devuelve nada.
+     */
+    const handleClickContacto = (e) =>{
+        e.preventDefault();
+        navigate('/contacto');
+    }
+
+    /**
      * @brief Redirige hacia la pagina que habla sobre ellos.
      * @fecha 2026-01-09
      * @returns {void} No devuelve nada.
@@ -87,10 +97,9 @@ export default function Header({ onSearchChange }) {
                             <ul className="flex flex-wrap space-x-4 m-1 items-center mx-auto">
                                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                                 <li><a href="/catalogo" className="hover:underline " onClick={handleClickCatalogo}>Catálogo</a></li>
-                                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                                 <li><a href="#seccionDestacados" className="hover:underline ">Novedades</a></li>
-                                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                                 <li><a href="/sobreNosotros" className="hover:underline " onClick={handleClickSobreNostros}>Sobre nosotros</a></li>
+                                <li><a href="/sobreNosotros" className="hover:underline " onClick={handleClickContacto}>Contacto</a></li>
                             </ul>
                         </nav>
 

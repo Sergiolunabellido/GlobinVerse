@@ -175,14 +175,14 @@ export default function Carrito(){
                     <h1 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">Mi carrito</h1>
                     <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300">Revisa tus articulos antes del pago</p>
                 </div>
-                <div id="divListaResumenPedido" className="flex flex-col lg:flex-row gap-5 justify-between w-full">
+                <div id="divListaResumenPedido" className="flex flex-col lg:flex-row gap-5 justify-between w-full ">
                     <div id="divListaPedido" className="flex flex-col gap-4 sm:gap-5 w-full lg:w-[65%] xl:w-[70%] p-2">
                        {libros.map((libro) => (
                             <div key={libro.id_libro} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-5 w-full border border-solid rounded-xl border-gray-500">
                                 <div className="flex items-center w-full sm:w-[60%] md:w-[55%] gap-3 sm:gap-5">
                                     <img src={libro.url_imagen} alt={libro.titulo} className="w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-36 rounded-lg object-cover flex-shrink-0"/>
                                     <div className="flex flex-col gap-1 sm:gap-2 items-start overflow-hidden">
-                                        <p className="text-lg sm:text-xl md:text-2xl font-semibold truncate w-full">{libro.titulo}</p>
+                                        <p className="text-lg sm:text-xl md:text-2xl font-semibold  ">{libro.titulo}</p>
                                         <p className="text-sm sm:text-base md:text-lg text-gray-500">Por {libro.autor}</p>
                                         <p className="text-base sm:text-lg md:text-xl font-medium">${parseFloat(libro.precio).toFixed(2)}</p>
                                     </div>

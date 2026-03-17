@@ -8,6 +8,7 @@ import Perfil from './Pages/Perfil/perfil'
 import Catalogo from './Pages/Catalogo/catalogo';
 import Carrito from './Pages/Carrito/carrito';
 import SobreNosotros from './Pages/Sobre Nosotros/sobreNosotros';
+import Contacto from './Pages/Contacto/contacto';
 
 /**
  * @brief Componente raiz con rutas principales.
@@ -54,6 +55,7 @@ function App() {
         <Route path="/catalogo" element={<Catalogo />} />
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/sobreNosotros" element={<SobreNosotros/>} />
+        <Route path="/contacto" element={<Contacto/>} />
       </Routes>
     </div>
   );
