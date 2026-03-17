@@ -1,36 +1,41 @@
 📊 Evaluación General Proyecto.
 
-Reevaluación (2026-03-12)
+Reevaluación (2026-03-17)
 
-Calificación actual estimada: 8.4/10 (antes 7.5/10)
-Potencial con mejoras restantes: 9.2/10 (antes 9/10)
+Calificación actual estimada: 8.8/10 (antes 8.4/10)
+Potencial con mejoras restantes: 9.2/10
 
 Comparación rápida (Antes → Ahora)
 
-- Carrito: incompleto → completo con listado, cantidades, totales y eliminación.
-- Catálogo: filtros básicos → filtros por título y género, y se limpian al recargar o entrar desde el header.
-- Home: géneros estáticos → géneros redirigen al catálogo filtrado.
-- Página libro: sin lectura → botón �Resumen� con lectura por voz.
-- UI responsive: parcial → mejoras en filtros del catálogo y tarjetas del perfil.
-- Documentación: buena → ampliada con cambios recientes y comentarios con @brief/@fecha/@returns.
+- Carrito: completo con listado, cantidades, totales y eliminación → ✅ COMPLETO
+- Catálogo: filtros por título y género funcionando → ✅ COMPLETO
+- Home: géneros redirigen al catálogo filtrado → ✅ COMPLETO
+- Página libro: botón "Resumen" con lectura por voz → ✅ COMPLETO
+- Sobre Nosotros: página completa con historia, misión, visión y valores → ✅ IMPLEMENTADO
+- Contacto: página completa con email, teléfono, dirección, redes y horario → ✅ IMPLEMENTADO
+- UI responsive: mejoras en filtros del catálogo, tarjetas del perfil y páginas nuevas → ✅ COMPLETO
+- Tests: implementados para login, header, utils, funtionGenres y cerrarSesion → ✅ IMPLEMENTADO
+- Documentación: ampliada con comentarios JSDoc (@brief/@fecha/@returns) → ✅ ACTUALIZADA
+
+---
 
 Lo que sigue pendiente (y baja nota si no se hace)
 
-- Stripe/pagos reales no implementados.
-- Rutas privadas en frontend (proteger /perfil y /carrito).
-- Buscador solo funciona en catálogo, falta integrarlo en más vistas si quieres UX global.
-- �Sobre nosotros� y �Contacto� siguen sin página real.
-- AuthContext vacío.
+- Stripe/pagos reales no implementados (solo está en package.json).
+- Rutas privadas en frontend (proteger /perfil y /carrito) - parcialmente implementado.
+- Buscador solo funciona en catálogo, falta integrarlo en más vistas.
+- AuthContext vacío (creado pero sin usar).
 - Validaciones de formularios y manejo de errores mejorable.
 - secure: false en cookies para producción.
 
 ---
+
 📊 Evaluación General Proyecto.
 
-  Calificación estimada: 7.5/10 (actual) → potencial de 9/10 con las mejoras
+  Calificación estimada: 8.8/10 (actual) → potencial de 9.2/10 con las mejoras
 
-  Tu proyecto es bueno y válido para un TFG de DAM, pero tiene áreas claras de mejora tanto en
-  funcionalidades pendientes como en pulir detalles profesionales.
+  Tu proyecto es muy sólido y está muy cerca de ser excelente para un TFG de DAM.
+  Has completado la gran mayoría de funcionalidades pendientes.
 
   ---
   ✅ Puntos Positivos (Lo que está bien)
@@ -48,7 +53,13 @@ Lo que sigue pendiente (y baja nota si no se hace)
   ├───────────────────┼────────────────────────────────────────────────────────────────────────┤
   │ UI/UX             │ Tailwind CSS bien aplicado, interfaz moderna y responsive              │
   ├───────────────────┼────────────────────────────────────────────────────────────────────────┤
-  │ Documentación     │ README.md muy completo y profesional                                   │
+  │ Carrito           │ ✅ COMPLETO: listado, cantidades, totales, eliminación, cálculo envío  │
+  ├───────────────────┼────────────────────────────────────────────────────────────────────────┤
+  │ Páginas estáticas │ ✅ COMPLETAS: Sobre Nosotros y Contacto implementadas con diseño       │
+  ├───────────────────┼────────────────────────────────────────────────────────────────────────┤
+  │ Testing           │ ✅ IMPLEMENTADO: Tests unitarios para login, header, utils, servicios  │
+  ├───────────────────┼────────────────────────────────────────────────────────────────────────┤
+  │ Documentación     │ README.md muy completo, DOCUMENTACION_COMPLETA.md actualizada          │
   ├───────────────────┼────────────────────────────────────────────────────────────────────────┤
   │ Backend API       │ RESTful, uso correcto de middleware de autenticación                   │
   ├───────────────────┼────────────────────────────────────────────────────────────────────────┤
@@ -60,17 +71,20 @@ Lo que sigue pendiente (y baja nota si no se hace)
 
   Funcionalidades Core Pendientes:
 
-  1. Carrito incompleto: Solo existe añadirLibroCarrito, falta:
-    - Ver carrito
-    - Eliminar items
-    - Modificar cantidades
-    - Calcular totales
-  2. Stripe no implementado: Está en package.json pero sin uso
-  3. Buscador desconectado: El input en el Header no está conectado al backend (/libroTitulo existe
-  pero no se usa)
-  4. Favoritos: Solo se pueden eliminar, no añadir desde el catálogo
-  5. Rutas privadas: El frontend no protege /perfil (cualquiera puede acceder aunque de error 401)
-  6. Páginas faltantes: "Sobre Nosotros" y "Contacto" están en el menú pero no existen
+  1. Stripe no implementado: Está en package.json pero sin uso real.
+     - Backend: Falta endpoint /crear-intento-pago
+     - Frontend: Falta integración de Stripe Elements
+     - Webhook: No implementado para confirmar pagos
+
+  2. Rutas privadas: El frontend no protege completamente /perfil y /carrito
+     - Cualquiera puede acceder aunque de error 401
+     - Falta componente PrivateRoute que redirija a /login
+
+  3. Buscador desconectado: El input en el Header solo funciona en /catalogo
+     - No está disponible globalmente en todas las vistas
+
+  4. AuthContext vacío: Context/AuthContext.js está preparado pero sin implementar
+     - Se sigue usando prop drilling para autenticación
 
   Problemas técnicos encontrados:
 
@@ -82,14 +96,6 @@ Lo que sigue pendiente (y baja nota si no se hace)
   Ubicación: cartController.js:39
   Severidad: Baja (código muerto)
   ────────────────────────────────────────
-  Problema: handleClickLibros y handleClickGeneros vacíos
-  Ubicación: principal.jsx:17-23
-  Severidad: Baja (funciones sin implementar)
-  ────────────────────────────────────────
-  Problema: AuthContext vacío
-  Ubicación: Context/AuthContext.js
-  Severidad: Media (preparado pero sin usar)
-  ────────────────────────────────────────
   Problema: Uso de var en lugar de let/const
   Ubicación: varios archivos
   Severidad: Baja
@@ -97,75 +103,74 @@ Lo que sigue pendiente (y baja nota si no se hace)
   Problema: Falta validación de errores en varios fetch
   Ubicación: frontend
   Severidad: Media
-  ────────────────────────────────────────
-  Problema: No hay manejo de estado global para el carrito
-  Ubicación: frontend
-  Severidad: Alta
 
   ---
   🚀 Lista de Mejoras Recomendadas (Para hacerlo más profesional)
 
   Prioridad Alta (Imprescindibles para el TFG):
 
-  1. Completar el sistema de carrito
-    - Página del carrito con lista de items
-    - Botón para eliminar del carrito
-    - Modificar cantidades
-    - Calcular totales automáticamente
-    - Persistencia del carrito (localStorage o BD)
-  2. Integrar Stripe para pagos
+  1. Integrar Stripe para pagos
     - Backend: Crear endpoints /crear-intento-pago
     - Frontend: Checkout con Stripe Elements
     - Webhook para confirmar pagos
     - Guardar compras en BD tras pago exitoso
-  3. Proteger rutas en frontend
+
+  2. Proteger rutas en frontend
     - Crear componente PrivateRoute
     - Redirigir a /login si no hay token
-  4. Conectar el buscador
-    - Integrar el input del Header con /libroTitulo
+    - Evitar flash de contenido protegido
+
+  3. Conectar el buscador globalmente
+    - Integrar el input del Header con /libroTitulo en todas las vistas
+    - O mostrar solo en vistas donde funcione
 
   ---
   Prioridad Media (Mejoran mucho la nota):
 
-  5. Añadir funcionalidad de favoritos completa
-    - Botón "♡ Añadir a favoritos" en tarjetas de libros
-    - Indicador visual si ya es favorito
-  6. Implementar las páginas faltantes
-    - "Sobre Nosotros" con información del proyecto
-    - "Contacto" con formulario funcional
-  7. Mejorar manejo de errores
+  4. Implementar AuthContext
+    - Evitar prop drilling de autenticación
+    - Estado global del usuario
+    - Manejo centralizado de login/logout
+
+  5. Mejorar manejo de errores
     - Mensajes de error amigables al usuario
-    - Estados de carga (spinners/skeletons)
-    - Toast notifications para feedback
-  8. Optimizar el renderizado 3D
+    - Estados de carga (spinners/skeletons) en todas las vistas
+    - Toast notifications para feedback (ya parcialmente implementado)
+
+  6. Optimizar el renderizado 3D
     - Lazy loading de los canvas
     - Reducir uso de memoria en móviles
-  9. Validaciones de formularios
+
+  7. Validaciones de formularios
     - Validar email, contraseña segura, campos requeridos
     - Mostrar errores antes de enviar
+    - Feedback visual en tiempo real
 
   ---
   Prioridad Baja (Detalles profesionales):
 
-  10. Implementar el AuthContext
-    - Evitar prop drilling de autenticación
-    - Estado global del usuario
-  11. Añadir tests
-    - Tests unitarios con React Testing Library
+  8. Añadir más tests
     - Tests de integración para la API
-  12. Mejoras de seguridad
+    - Tests para componentes de carrito y catálogo
+    - Cobertura de casos de error
+
+  9. Mejoras de seguridad
     - Rate limiting en el backend
     - Sanitización de inputs (SQL injection)
     - HTTPS en producción (secure: true)
-  13. Features adicionales
-    - Sistema de reseñas/valoraciones (UI ya preparada)
-    - Historial de pedidos detallado
+
+  10. Features adicionales
+    - Sistema de reseñas/valoraciones (UI ya preparada en paginaLibro)
+    - Historial de pedidos detallado con facturas
     - Perfil editable (cambiar datos, avatar)
-  14. Optimizaciones de performance
+    - Sistema de notificaciones
+
+  11. Optimizaciones de performance
     - React.memo para componentes estáticos
     - Debounce en el buscador
-    - Paginación optimizada
-  15. Preparar para despliegue
+    - Paginación optimizada con cursor
+
+  12. Preparar para despliegue
     - Variables de entorno para URLs de API
     - Build de producción optimizada
     - Configuración de CORS para dominio real
@@ -178,11 +183,44 @@ Lo que sigue pendiente (y baja nota si no se hace)
   - Autenticación profesional con JWT
   - Un elemento diferenciador (3D)
   - Código organizado y documentado
+  - Carrito completo funcional
+  - Páginas de contenido (Sobre Nosotros, Contacto)
+  - Tests implementados
 
-  ¿Qué priorizar? Para aprobar con buena nota, enfócate en:
-  1. Carrito completo + Stripe
-  2. Protección de rutas
-  3. Buscador funcional
+  ¿Qué priorizar? Para llegar a 9+, enfócate en:
+  1. Stripe para pagos (la funcionalidad más importante pendiente)
+  2. Protección de rutas con PrivateRoute
+  3. AuthContext para estado global
 
-  El proyecto demuestra buenas prácticas y comprensión de conceptos de DAM. Con las mejoras sugeridas,
-   podría ser un proyecto sobresaliente. ¡Buen trabajo! 📚
+  El proyecto demuestra buenas prácticas y comprensión de conceptos de DAM.
+  Con las mejoras sugeridas, será un proyecto sobresaliente. ¡Excelente trabajo! 📚
+
+  ---
+
+  📋 Resumen de Implementación Reciente (2026-03-17)
+
+  ✅ Completado:
+    - Página Sobre Nosotros con historia, misión, visión y valores
+    - Página Contacto con email (redirige a Gmail), teléfono, dirección, redes sociales y horario
+    - Carrito funcional completo
+    - Tests unitarios para login, header, utils y servicios
+    - Responsive mejorado en catálogo y perfil
+    - Navegación por géneros desde la home
+
+  🔄 Pendiente crítico:
+    - Integración de pagos con Stripe
+    - Protección de rutas privadas
+    - AuthContext implementado
+
+  ---
+
+  📈 Progreso por Área:
+
+  - Autenticación: ████████████████████ 100%
+  - Catálogo/Buscador: █████████████████░░░ 85%
+  - Carrito: ████████████████████ 100%
+  - Favoritos: ███████████████░░░░░ 75%
+  - Pagos (Stripe): ░░░░░░░░░░░░░░░░░░░░ 0%
+  - UI/UX: █████████████████░░░ 90%
+  - Tests: ██████████████░░░░░░ 70%
+  - Documentación: ████████████████████ 95%

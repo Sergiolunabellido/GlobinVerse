@@ -1,6 +1,6 @@
-﻿# 📚 GoblinVerse (proyectode0) — Documentación Técnica Completa
+# 📚 GoblinVerse (proyectode0) — Documentación Técnica Completa
 
-Fecha de documentación: 2026-03-12
+Fecha de documentación: 2026-03-17
 
 ## ✨ Resumen
 GoblinVerse es una aplicación full-stack para una librería fantástica. Incluye un frontend React con navegación SPA y renderizado 3D de portadas, y un backend Express con autenticación JWT (access + refresh), persistencia en MySQL y endpoints para usuarios, libros, favoritos, compras y carrito. El diseño visual se apoya en Tailwind CSS y estilos personalizados. La página del libro incluye lectura por voz de la descripción.
@@ -47,6 +47,8 @@ proyectode0/
 ├─ .env
 ├─ .gitignore
 ├─ README.md
+├─ DOCUMENTACION_COMPLETA.md
+├─ 📊 Evaluación General Proyecto.md
 ├─ package.json
 ├─ package-lock.json
 ├─ tailwind.config.js
@@ -81,7 +83,11 @@ proyectode0/
 │  │  │  ├─ login.jsx
 │  │  │  └─ styles-login.css
 │  │  ├─ Perfil/perfil.jsx
-│  │  └─ Carrito/carrito.jsx
+│  │  ├─ Carrito/carrito.jsx
+│  │  ├─ Sobre Nosotros/
+│  │  │  ├─ sobreNosotros.jsx
+│  │  │  └─ sobreNosotros.css
+│  │  └─ Contacto/contacto.jsx
 │  └─ Components/
 │     ├─ Header/header.jsx
 │     ├─ Footer/footer.jsx
@@ -166,6 +172,8 @@ Scripts backend:
     - `/libro/:id` → `PageBook`.
     - `/catalogo` → `Catalogo`.
     - `/carrito` → `Carrito`.
+    - `/sobreNosotros` → `SobreNosotros`.
+    - `/contacto` → `Contacto`.
 
 ### 🧭 Páginas
 
@@ -183,7 +191,7 @@ Scripts backend:
 - Filtro por géneros con `POST /librosFiltrados`.
 - Paginación local con `LIBROS_POR_PAGINA = 12`.
 - Al hacer click en un libro navega a `/libro/:id` pasando el libro por `state`.
-- Limpia filtros al recargar o al entrar desde el link “Catálogo”.
+- Limpia filtros al recargar o al entrar desde el link "Catálogo".
 - Panel de filtros y géneros responsive.
 
 3. `src/Pages/Libros/paginaLibro.jsx`
@@ -194,14 +202,14 @@ Scripts backend:
 - `comprobarFavorito()` consulta `POST /librosFavoritos`.
 - `anadirFavorito()` llama a `POST /anadirFavorito`.
 - Si no hay `state.libro`, carga desde `POST /libroId`.
-- Calcula un “precio original” sumando 10 al precio actual.
-- Botón “Resumen” que lee la descripción con `speechSynthesis` y voz automática.
+- Calcula un "precio original" sumando 10 al precio actual.
+- Botón "Resumen" que lee la descripción con `speechSynthesis` y voz automática.
 
 4. `src/Pages/Login/login.jsx`
 - Alterna entre modo login y registro con `isLoginView`.
 - Login: `BotonEnviarLogin` envía usuario y contraseña.
 - Registro: `BotonEnviarRegistro` envía nombre, email y contraseña.
-- UI incluye botones “Google” y “Facebook” sin lógica.
+- UI incluye botones "Google" y "Facebook" sin lógica.
 
 5. `src/Pages/Perfil/perfil.jsx`
 - Dashboard con barra lateral.
@@ -216,6 +224,18 @@ Scripts backend:
 - Calcula subtotal y total con envío fijo `PRECIO_ENVIO = 5.99`.
 - Si el token expira, usa `renovarToken()`.
 
+7. `src/Pages/Sobre Nosotros/sobreNosotros.jsx`
+- Página completa con historia de GoblinVerse.
+- Sección de Misión y Visión con tarjetas.
+- Sección de Valores (Pasión sin límites, Comunidad unida, Calidad curada).
+- Diseño responsive con fondo temático.
+
+8. `src/Pages/Contacto/contacto.jsx`
+- Tarjetas de información: Email (redirige a Gmail), Teléfono, Dirección.
+- Sección de redes sociales (Instagram, Twitter, Facebook, TikTok).
+- Horario de atención.
+- Diseño responsive con tarjetas interactivas.
+
 ### 🧱 Componentes
 
 - `src/Components/Header/header.jsx`
@@ -223,7 +243,8 @@ Scripts backend:
 - El buscador solo aparece en `/catalogo`.
 - Botón usuario depende de si hay token en `localStorage`.
 - Botón carrito navega a `/carrito`.
-- El link “Catálogo” entra con filtros limpios.
+- El link "Catálogo" entra con filtros limpios.
+- Links a "Sobre Nosotros" y "Contacto".
 
 - `src/Components/Footer/footer.jsx`
   - Pie de página con copyright.
@@ -275,6 +296,7 @@ Scripts backend:
 - `src/App.css`: tipografía Orbitron y detalles de render.
 - `src/Pages/Principal/principal.css`: fondo de presentación.
 - `src/Pages/Login/styles-login.css`: estilos completos de login y registro.
+- `src/Pages/Sobre Nosotros/sobreNosotros.css`: estilos de la página Sobre Nosotros.
 
 ---
 
@@ -478,8 +500,11 @@ Tablas deducidas a partir de consultas SQL en controllers.
   - `fecha`
 
 - `carrito`
+  - `id_carrito` (PK)
   - `id_user` (FK a `usuarios`)
   - `id_libro` (FK a `libros`)
+  - `cantidad`
+  - `fecha`
 
 ---
 
@@ -514,20 +539,34 @@ Carpeta `public/images`:
 - `fondotitulo.png`
 - `logoLibreria2.jpg`
 - `Library--Streamline-Ionic-Filled.svg`
-- `google-app-logo-in-big-sur-style-3d-render-icon-design-concept-element-isolated-transparent-background-free-png.webp`
-- `facebook-3d-facebook-logo-3d-facebook-icon-3d-facebook-symbol-free-png.webp`
-- `icono-transparente-facebook-formato-psd_1073073-360.webp`
+- `google-app-logo...webp`
+- `facebook-3d...webp`
+- `icono-transparente-facebook...webp`
 - `workspace.code-workspace`
 
 Uso principal:
 - Fondos en `principal.css` y `styles-login.css`.
 - Íconos en login.
+- Imágenes de géneros en la home.
 
 ---
 
 ## 🧪 Testing
-- `src/App.test.js` contiene el test por defecto de CRA (busca “learn react”).
+Tests implementados:
+- `src/App.test.js` — Test por defecto de CRA.
+- `src/Pages/Login/login.test.js` — Tests de login.
+- `src/Components/Header/header.test.js` — Tests del header.
+- `src/utils/utils.test.js` — Tests de utilidades.
+- `src/Services/funtionGenres.test.js` — Tests de géneros.
+- `src/Services/cerrarSesion.test.js` — Tests de cierre de sesión.
+
+Configuración:
 - `src/setupTests.js` configura `@testing-library/jest-dom`.
+
+Ejecución:
+```bash
+npm test
+```
 
 ---
 
@@ -537,9 +576,12 @@ Archivo: `📊 Evaluación General Proyecto.md`.
 Puntos destacables del informe:
 - Autenticación JWT completa con refresh.
 - UI moderna con Tailwind y renderizado 3D.
-- Carrito incompleto y Stripe no implementado.
+- Carrito completo implementado.
+- Páginas Sobre Nosotros y Contacto implementadas.
+- Tests implementados.
+- Stripe no implementado.
 - Rutas privadas pendientes en frontend.
-- Buscador en Header no conectado en todas las vistas.
+- AuthContext vacío.
 
 ---
 
@@ -549,6 +591,8 @@ Archivos raíz:
 - `c:\Users\sergi\Desktop\proyectode0\.env`: configuración CRA.
 - `c:\Users\sergi\Desktop\proyectode0\.gitignore`: exclusiones git.
 - `c:\Users\sergi\Desktop\proyectode0\README.md`: documentación general del proyecto.
+- `c:\Users\sergi\Desktop\proyectode0\DOCUMENTACION_COMPLETA.md`: documentación técnica completa.
+- `c:\Users\sergi\Desktop\proyectode0\📊 Evaluación General Proyecto.md`: evaluación y nota estimada.
 - `c:\Users\sergi\Desktop\proyectode0\package.json`: dependencias y scripts frontend.
 - `c:\Users\sergi\Desktop\proyectode0\package-lock.json`: lock de dependencias frontend.
 - `c:\Users\sergi\Desktop\proyectode0\tailwind.config.js`: configuración Tailwind.
@@ -589,6 +633,9 @@ Frontend:
 - `c:\Users\sergi\Desktop\proyectode0\src\Pages\Login\styles-login.css`: estilos login.
 - `c:\Users\sergi\Desktop\proyectode0\src\Pages\Perfil\perfil.jsx`: perfil.
 - `c:\Users\sergi\Desktop\proyectode0\src\Pages\Carrito\carrito.jsx`: carrito.
+- `c:\Users\sergi\Desktop\proyectode0\src\Pages\Sobre Nosotros\sobreNosotros.jsx`: sobre nosotros.
+- `c:\Users\sergi\Desktop\proyectode0\src\Pages\Sobre Nosotros\sobreNosotros.css`: estilos sobre nosotros.
+- `c:\Users\sergi\Desktop\proyectode0\src\Pages\Contacto\contacto.jsx`: contacto.
 - `c:\Users\sergi\Desktop\proyectode0\src\Components\Header\header.jsx`: header.
 - `c:\Users\sergi\Desktop\proyectode0\src\Components\Footer\footer.jsx`: footer.
 - `c:\Users\sergi\Desktop\proyectode0\src\Components\MiPerfil\miPerfil.jsx`: panel perfil.
