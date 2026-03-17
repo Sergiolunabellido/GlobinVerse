@@ -170,66 +170,75 @@ export default function Carrito(){
     return (
        <div className="body1 flex flex-col items-center w-screen min-h-screen bg-[#102216]">  
             <Header/>
-            <div id="divPadreCarrito" className="flex flex-col gap-3 p-5 w-screen flex-grow">
-                <div id="divTituloPedido" className="flex flex-col gap-3 items-start m-5">
-                    <h1 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold">Mi carrito</h1>
-                    <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-gray-300">Revisa tus articulos antes del pago</p>
+            <div id="divPadreCarrito" className="flex flex-col gap-3 p-3 sm:p-5 w-full flex-grow">
+                <div id="divTituloPedido" className="flex flex-col gap-2 sm:gap-3 items-start m-2 sm:m-5">
+                    <h1 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">Mi carrito</h1>
+                    <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300">Revisa tus articulos antes del pago</p>
                 </div>
-                <div id="divListaResumenPedido" className="flex gap-5 justify-between w-[100%] h-[100%]">
-                    <div id="divListaPedido" className="flex flex-col gap-5 w-[70%]  p-2">
+                <div id="divListaResumenPedido" className="flex flex-col lg:flex-row gap-5 justify-between w-full">
+                    <div id="divListaPedido" className="flex flex-col gap-4 sm:gap-5 w-full lg:w-[65%] xl:w-[70%] p-2">
                        {libros.map((libro) => (
-                            <div key={libro.id_libro} className="flex items-center justify-between gap-3 p-5 w-[100%] min-h-[180px] max-h-[200px] border border-solid rounded-xl border-gray-500">
-                                <div className="flex items-center w-[50%] min-h-[180px] max-h-[200px] gap-5">
-                                    <img src={libro.url_imagen} alt={libro.titulo} className="w-[25%] h-[160px] rounded-lg object-cover"/>
-                                    <div className="flex flex-col gap-2 items-start ">
-                                        <p className="text-2xl ">{libro.titulo}</p>
-                                        <p className="text-lg text-gray-500">Por {libro.autor}</p>
-                                        <p className="text-xl ">${parseFloat(libro.precio).toFixed(2)}</p>
+                            <div key={libro.id_libro} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-5 w-full border border-solid rounded-xl border-gray-500">
+                                <div className="flex items-center w-full sm:w-[60%] md:w-[55%] gap-3 sm:gap-5">
+                                    <img src={libro.url_imagen} alt={libro.titulo} className="w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-36 rounded-lg object-cover flex-shrink-0"/>
+                                    <div className="flex flex-col gap-1 sm:gap-2 items-start overflow-hidden">
+                                        <p className="text-lg sm:text-xl md:text-2xl font-semibold truncate w-full">{libro.titulo}</p>
+                                        <p className="text-sm sm:text-base md:text-lg text-gray-500">Por {libro.autor}</p>
+                                        <p className="text-base sm:text-lg md:text-xl font-medium">${parseFloat(libro.precio).toFixed(2)}</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-5 items-center w-[30%] h-[100%] gap-[15%]">
-                                    <div className="flex items-center justify-between ps-3 pe-3 w-[30%] h-[20%] bg-gray-500 rounded-2xl">
-                                        <button className="text-2xl" onClick={() => cantidadMenos1(libro.id_libro)}>-</button>
-                                        <p className="text-xl">{cantidadesPorLibro[libro.id_libro] ?? 1}</p>
-                                        <button className="text-2xl w-10%" onClick={() => cantidadMas1(libro.id_libro)}>+</button>
+                                <div className="flex items-center justify-between sm:justify-end w-full sm:w-[40%] md:w-[45%] gap-3 sm:gap-4 md:gap-6">
+                                    <div className="flex items-center justify-between px-3 sm:px-4 w-28 sm:w-32 h-10 bg-gray-500 rounded-2xl">
+                                        <button className="text-xl sm:text-2xl px-2" onClick={() => cantidadMenos1(libro.id_libro)}>-</button>
+                                        <p className="text-base sm:text-lg md:text-xl font-medium">{cantidadesPorLibro[libro.id_libro] ?? 1}</p>
+                                        <button className="text-xl sm:text-2xl px-2" onClick={() => cantidadMas1(libro.id_libro)}>+</button>
                                     </div>
-                                    <div className="flex items-center justify-around w-[50%] ">
-                                        <h1 className="text-xl font-bold">
+                                    <div className="flex items-center justify-end gap-3 sm:gap-4">
+                                        <h1 className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap">
                                             ${((parseFloat(libro.precio) || 0) * (cantidadesPorLibro[libro.id_libro] ?? 1)).toFixed(2)}
                                         </h1>
-                                        <button onClick={() => eliminarLibro(libro.id_libro)}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg></button>
+                                        <button onClick={() => eliminarLibro(libro.id_libro)} className="p-1 hover:text-red-400 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M4 7l16 0" />
+                                                <path d="M10 11l0 6" />
+                                                <path d="M14 11l0 6" />
+                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                        ))}
                     </div>
-                    <div id="divResumenPedido" className="flex flex-col justify-between me-6 bg-[#1a3a25] w-full sm:w-[80%] md:w-[55%] lg:w-[30%] min-w-[320px] max-w-[440px] min-h-[520px] rounded-xl shadow-xl">
-                        <div id="divSubEnvio" className="flex flex-col gap-4 m-4 items-start">
+                    <div id="divResumenPedido" className="flex flex-col justify-between lg:me-6 bg-[#1a3a25] w-full lg:w-[35%] xl:w-[30%] lg:max-w-[440px] lg:sticky lg:top-4 lg:self-start min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] rounded-xl shadow-xl">
+                        <div id="divSubEnvio" className="flex flex-col gap-3 sm:gap-4 m-4 sm:m-5 items-start">
 
-                            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 font-bold">Resumen Pedido</h1>
+                            <h1 className="text-lg sm:text-xl md:text-2xl text-gray-300 font-bold">Resumen Pedido</h1>
 
-                            <div id="divSubtotalPedido" className="flex items-center justify-between gap-3 w-[100%]">
-                                <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-300 font-bold">Subtotal: </p>
-                                <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-300">${subtotal.toFixed(2)}</p>
+                            <div id="divSubtotalPedido" className="flex items-center justify-between gap-3 w-full">
+                                <p className="text-sm sm:text-base md:text-lg text-gray-300 font-bold">Subtotal: </p>
+                                <p className="text-sm sm:text-base md:text-lg text-gray-300">${subtotal.toFixed(2)}</p>
                             </div>
 
-                            <div id="divPrecioEnvio" className="flex items-center justify-between  gap-3 w-[100%]">
-                                <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-300 font-bold">Precio envio: </p>
-                                <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-300">${PRECIO_ENVIO.toFixed(2)}</p>
+                            <div id="divPrecioEnvio" className="flex items-center justify-between gap-3 w-full">
+                                <p className="text-sm sm:text-base md:text-lg text-gray-300 font-bold">Precio envio: </p>
+                                <p className="text-sm sm:text-base md:text-lg text-gray-300">${PRECIO_ENVIO.toFixed(2)}</p>
                             </div>
 
                         </div>
-                        <hr />
-                        <div id="divTotalBotonesCompra"  className="flex flex-col gap-5 m-4 justify-between h-[50%]">
-                            <div id="divTotalPedido" className="flex items-center justify-between w-[100%]">
-                                <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-gray-200">Total: </p>
-                                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300">${precioTotal.toFixed(2)}</p>
+                        <hr className="border-gray-600" />
+                        <div id="divTotalBotonesCompra" className="flex flex-col gap-4 sm:gap-5 m-4 sm:m-5 justify-between flex-grow">
+                            <div id="divTotalPedido" className="flex items-center justify-between w-full">
+                                <p className="text-base sm:text-lg md:text-xl font-bold text-gray-200">Total: </p>
+                                <p className="text-base sm:text-lg md:text-xl text-gray-300">${precioTotal.toFixed(2)}</p>
                             </div>
-                            <div id="divBotonesCompra" className="flex flex-col gap-4 h-[50%]">
-                                <button id="botonComprar" className="bg-green-600 hover:bg-green-700 text-black text-sm sm:text-base md:text-lg lg:text-xl font-bold py-2 sm:py-3 px-4 sm:px-6 md:px-8 rounded-[10px] transition duration-300 ease-in-out">
+                            <div id="divBotonesCompra" className="flex flex-col gap-3 sm:gap-4">
+                                <button id="botonComprar" className="bg-green-600 hover:bg-green-700 text-black text-base sm:text-lg md:text-xl font-bold py-2.5 sm:py-3 px-4 sm:px-6 md:px-8 rounded-[10px] transition duration-300 ease-in-out w-full">
                                     Procesar Pago
                                 </button>
-                                <button id="botonSeguirComprando" onClick={handleClickCatalogo} className="text-green-600 hover:text-green-700 text-sm sm:text-base md:text-lg lg:text-xl font-bold py-2 sm:py-3 transition duration-300 ease-in-out">
+                                <button id="botonSeguirComprando" onClick={handleClickCatalogo} className="text-green-600 hover:text-green-700 text-base sm:text-lg md:text-xl font-bold py-2 sm:py-3 transition duration-300 ease-in-out text-center">
                                     Continuar Compra
                                 </button>
                             </div>

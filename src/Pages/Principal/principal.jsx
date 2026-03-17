@@ -38,7 +38,7 @@ export default function Principal (){
         if (nombre.includes("fantasia")) valor = "Fantasia";
         else if (nombre.includes("ciencia")) valor = "Ciencia Ficcion ";
         else if (nombre.includes("misterio")) valor = "Misterio";
-        else if (nombre.includes("thrill") || nombre.includes("thiller")) valor = "Thriller";
+        else if (nombre.includes("programacion") || nombre.includes("programacion")) valor = "Programacion";
         if (!valor) return;
         navigate("/catalogo", { state: { generos: [valor] } });
     };

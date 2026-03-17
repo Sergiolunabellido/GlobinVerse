@@ -214,7 +214,7 @@ export default function Catalogo(){
                         </div>
                     </div>
                 </div>
-                <div className='flex flex-wrap items-center w-full md:w-[90%] m-2'>
+                <div className='flex flex-wrap items-center justify-center md:justify-start w-full md:w-[90%] m-2'>
                         {librosPaginados.map((libro) => (
                                 <div
                                     key={`${libro.id_libro ?? "libro"}`}
