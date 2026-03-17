@@ -1,0 +1,5 @@
+#divTituloPagina{
+    background-image: url("../../../public/images/fondoSobreNosotros.png");
+    background-size: cover;
+    background-position: center;
+}

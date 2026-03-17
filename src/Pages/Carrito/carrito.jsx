@@ -24,9 +24,9 @@ export default function Carrito(){
     };
 
     const [libros, setLibros] = useState([]);
-    const [cantidadLibros, setCantidadLibros] = useState(1)
+ 
     const [cantidadesPorLibro, setCantidadesPorLibro] = useState({})
-    const [precioLibro, setPrecioLibro] = useState()
+    
     const PRECIO_ENVIO = 5.99;
 
     /**

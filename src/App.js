@@ -7,6 +7,7 @@ import PageBook from './Pages/Libros/paginaLibro';
 import Perfil from './Pages/Perfil/perfil'
 import Catalogo from './Pages/Catalogo/catalogo';
 import Carrito from './Pages/Carrito/carrito';
+import SobreNosotros from './Pages/Sobre Nosotros/sobreNosotros';
 
 /**
  * @brief Componente raiz con rutas principales.
@@ -52,6 +53,7 @@ function App() {
         <Route path="/libro/:id" element={<PageBook />} />
         <Route path="/catalogo" element={<Catalogo />} />
         <Route path="/carrito" element={<Carrito />} />
+        <Route path="/sobreNosotros" element={<SobreNosotros/>} />
       </Routes>
     </div>
   );

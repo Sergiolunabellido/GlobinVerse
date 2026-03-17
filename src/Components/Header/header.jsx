@@ -46,15 +46,25 @@ export default function Header({ onSearchChange }) {
         navigate('/catalogo', { state: null });
     }
 
+    /**
+     * @brief Redirige hacia la pagina que habla sobre ellos.
+     * @fecha 2026-01-09
+     * @returns {void} No devuelve nada.
+     */
+    const handleClickSobreNostros = (e) =>{
+        e.preventDefault();
+        navigate('/sobreNosotros');
+    }
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         setEstaLogueado(!!token)
     },[])
 
     return (
-        <div className="bg-[#102216] text-white xl:w-[100%]  p-4 flex items-center justify-between ">
-                    <div className="flex   p-1 xl:w-[100%]  items-center md:justify-between   ">
-
+        <div className="bg-[#102216] text-white xl:w-screen  p-4 flex items-center justify-between ">
+                    <div className="flex  p-1 xl:w-[100%]  items-center md:justify-between   ">
+                        
                         <div className="flex items-center m-[1rem]">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                  stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
@@ -80,9 +90,7 @@ export default function Header({ onSearchChange }) {
                                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                                 <li><a href="#seccionDestacados" className="hover:underline ">Novedades</a></li>
                                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                                <li><a href="#" className="hover:underline ">Sobre nosotros</a></li>
-                                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                                <li><a href="#" className="hover:underline ">Contacto</a></li>
+                                <li><a href="/sobreNosotros" className="hover:underline " onClick={handleClickSobreNostros}>Sobre nosotros</a></li>
                             </ul>
                         </nav>
 
