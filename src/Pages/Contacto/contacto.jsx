@@ -63,7 +63,7 @@ export default function Contacto(){
                         </div>
                         <h2 className='text-xl font-bold text-white text-center'>Direccion</h2>
                         <p className='text-sm text-green-300 text-center'>Calle de la Fantasia, 42</p>
-                        <p className='text-xs text-gray-400 text-center'>28001 Madrid, Espana</p>
+                        <p className='text-xs text-gray-400 text-center'>28001 Córdoba, España</p>
                     </div>
 
                     {/* Redes Sociales */}
