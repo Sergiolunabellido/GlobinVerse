@@ -9,6 +9,8 @@ import Catalogo from './Pages/Catalogo/catalogo';
 import Carrito from './Pages/Carrito/carrito';
 import SobreNosotros from './Pages/Sobre Nosotros/sobreNosotros';
 import Contacto from './Pages/Contacto/contacto';
+import Checkout from './Pages/Checkout/checkout';
+import PagoExitoso from './Pages/PagoExitoso/pagoExitoso';
 
 /**
  * @brief Componente raiz con rutas principales.
@@ -17,6 +19,7 @@ import Contacto from './Pages/Contacto/contacto';
  */
 function App() {
   return (
+
     <div className="App">
       <Toaster
         position="top-center"
@@ -56,6 +59,8 @@ function App() {
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/sobreNosotros" element={<SobreNosotros/>} />
         <Route path="/contacto" element={<Contacto/>} />
+        <Route path="/checkout" element={<Checkout/>} />
+        <Route path="/pago-exitoso" element={<PagoExitoso/>} />
       </Routes>
     </div>
   );

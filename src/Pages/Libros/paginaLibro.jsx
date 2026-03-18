@@ -5,6 +5,7 @@ import Header from "../../Components/Header/header";
 import { Canvas } from "@react-three/fiber";
 import {Libro3D} from '../../utils/utils'
 import { OrbitControls } from "@react-three/drei";
+import {useNavigate} from "react-router-dom";
 
 /**
  * @brief Devuelve un texto seguro cuando falta un dato.
@@ -36,6 +37,8 @@ function formatearFechaYMD(fechaRaw) {
 }
 
 
+
+
 /**
  * @brief Pagina de detalle de un libro.
  * @fecha 2026-01-28
@@ -48,7 +51,42 @@ export default function PageBook(){
     const [libro, setLibro] = useState(state?.libro || null);
     const [esFavorito, setEsFavorito] = useState(false);
     const [voces, setVoces] = useState([]);
+    const navigate = useNavigate();
    
+    /**
+     * @brief Redirige a la página de checkout para procesar el pago.
+     * @fecha 2026-03-18
+     * @description Pasa el monto total como estado de navegación para que
+     * el checkout pueda crear el intento de pago con el monto correcto.
+     * @returns {void} No devuelve nada.
+     */
+    const manejarProcesarPago = () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            toast.error("Debes iniciar sesion primero.");
+            navigate('/login');
+            return;
+        }
+
+        if (!libro) {
+            toast.error('No se pudo cargar el libro');
+            return;
+        }
+
+        const precio = Number.parseFloat(String(libro.precio).replace(',', '.'));
+        if (!Number.isFinite(precio) || precio <= 0) {
+            toast.error('Precio del libro inválido');
+            return;
+        }
+
+        sessionStorage.setItem('checkout_libros', JSON.stringify([id]));
+        navigate('/checkout', {
+            state: {
+                montoTotal: precio,
+            },
+        });
+    };
+
     useEffect(() => {
         if (!("speechSynthesis" in window)) return;
         /**
@@ -63,6 +101,8 @@ export default function PageBook(){
         window.speechSynthesis.addEventListener("voiceschanged", cargarVoces);
         return () => window.speechSynthesis.removeEventListener("voiceschanged", cargarVoces);
     }, []);
+
+
     /**
      * @brief Elige la mejor voz disponible en español.
      * @fecha 2026-01-28
@@ -78,6 +118,8 @@ export default function PageBook(){
         }
         return vocesES[0] || lista[0];
     };
+
+
     /**
      * @brief Lee la descripcion del libro con voz del navegador.
      * @fecha 2026-01-28
@@ -101,6 +143,8 @@ export default function PageBook(){
         utterance.rate = 0.98;
         window.speechSynthesis.speak(utterance);
     };
+
+
     /**
      * @brief Envia el libro actual al carrito del usuario.
      * @fecha 2026-01-28
@@ -133,6 +177,8 @@ export default function PageBook(){
                 console.error("Error al añadir al carrito:", error.message);
             });
     }
+
+
     /**
      * @brief Comprueba si el libro esta en favoritos.
      * @fecha 2026-01-28
@@ -161,6 +207,8 @@ export default function PageBook(){
             setEsFavorito(false);
         }
     }
+
+
     /**
      * @brief Anade el libro a favoritos si no esta.
      * @fecha 2026-01-28
@@ -197,6 +245,8 @@ export default function PageBook(){
             toast.error("Error al añadir a favoritos");
         }
     }
+
+
     useEffect(() => {
         if(!libro){
             fetch(`http://localhost:5000/libroId`,{
@@ -214,8 +264,8 @@ export default function PageBook(){
 
     if (!libro) return <p>Cargando...</p>;
 
-    const precioLibro = Number(libro.precio);
-    const precioOriginal = precioLibro + 10
+    const precioLibro = Number.parseFloat(String(libro.precio).replace(',', '.'));
+    const precioOriginal = (Number.isFinite(precioLibro) ? precioLibro : 0) + 10;
 
     return (
         <div className="body1 overflow-x-hidden flex flex-col items-center w-screen h-full bg-[#102216] text-gray-300 ">
@@ -288,7 +338,7 @@ export default function PageBook(){
                         
 
                         <button id="botonCarrito" className="flex items-center justify-center font-bold text-black bg-[#22C55E] text-1xl w-[30%] rounded-lg h-[4rem]" onClick={añadirLibroCarrito}> Añadir al carrito</button>
-                        <button id="botonCompra" className="flex items-center justify-center font-bold text-black bg-[#22C55E] text-1xl w-[30%] rounded-lg h-[4rem]">Comprar Libro</button>
+                        <button id="botonCompra" className="flex items-center justify-center font-bold text-black bg-[#22C55E] text-1xl w-[30%] rounded-lg h-[4rem]" onClick={manejarProcesarPago}>Comprar Libro</button>
                     </div>
                     <div id="descripcion" className="flex flex-col items-start text-justify w-[70%] mt-6 mb-5 gap-5">
                         <h1 className="font-bold text-2xl leading-tight truncate text-gray-300">Descripcion</h1>
@@ -319,10 +369,6 @@ export default function PageBook(){
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="reseñasUsuarios">
-                <div id="valoracionLibro"></div>
-                <div id="porcentajesEstrellas"></div>
             </div>
         </div>
     )

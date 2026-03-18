@@ -125,11 +125,13 @@ proyectode0/
 ## ⚙️ Configuración y Variables de Entorno
 - `c:\Users\sergi\Desktop\proyectode0\.env`
   - `GENERATE_SOURCEMAP=false` (desactiva sourcemaps en CRA).
+  - `REACT_APP_STRIPE_PUBLIC_KEY=pk_test_...` (clave pública Stripe en modo test).
 - `c:\Users\sergi\Desktop\proyectode0\backend\.env`
   - `JWT_SECRET=1234`
   - `JWT_REFRESH_SECRET=contraseña_refresco`
   - `JWT_EXPIRES_IN=15min`
   - `JWT_REFRESH_EXPIRES_IN=5d`
+  - `STRIPE_SECRET_KEY=sk_test_...` (clave secreta Stripe en modo test).
 
 Nota: el backend depende de estas variables para firmar y verificar tokens.
 
@@ -139,12 +141,12 @@ Nota: el backend depende de estas variables para firmar y verificar tokens.
 Frontend (`package.json`):
 - React 19, React Router DOM 7, react-hot-toast, three + @react-three/fiber/drei.
 - Tailwind CSS y Testing Library.
-- Stripe está declarado pero no usado en el frontend.
+- Stripe integrado con `@stripe/stripe-js` + `@stripe/react-stripe-js` (Checkout + PaymentElement).
 
 Backend (`backend/package.json`):
 - Express, cors, cookie-parser, jsonwebtoken, bcryptjs, mysql2.
 - Redis y sesiones listadas pero no usadas en código actual.
-- Stripe está declarado pero no usado en backend.
+- Stripe integrado en backend para crear PaymentIntents (`backend/routes/pagos.js`).
 
 Scripts frontend:
 - `npm start`, `npm build`, `npm test`, `npm run eject`.
@@ -171,9 +173,11 @@ Scripts backend:
     - `/perfil` → `Perfil`.
     - `/libro/:id` → `PageBook`.
     - `/catalogo` → `Catalogo`.
-    - `/carrito` → `Carrito`.
-    - `/sobreNosotros` → `SobreNosotros`.
-    - `/contacto` → `Contacto`.
+	    - `/carrito` → `Carrito`.
+	    - `/checkout` → `Checkout` (Stripe Elements).
+	    - `/pago-exitoso` → `PagoExitoso` (confirmación y registro de compra).
+	    - `/sobreNosotros` → `SobreNosotros`.
+	    - `/contacto` → `Contacto`.
 
 ### 🧭 Páginas
 
@@ -503,7 +507,7 @@ Tablas deducidas a partir de consultas SQL en controllers.
   - `id_carrito` (PK)
   - `id_user` (FK a `usuarios`)
   - `id_libro` (FK a `libros`)
-  - `cantidad`
+  - `cantidad` (opcional; cantidades actuales se gestionan en frontend)
   - `fecha`
 
 ---
@@ -579,9 +583,12 @@ Puntos destacables del informe:
 - Carrito completo implementado.
 - Páginas Sobre Nosotros y Contacto implementadas.
 - Tests implementados.
-- Stripe no implementado.
+- Stripe implementado en modo test (Checkout + PaymentIntent + confirmación + guardado de compra).
 - Rutas privadas pendientes en frontend.
 - AuthContext vacío.
+
+Documento relacionado:
+- `DOCUMENTACION_STRIPE.md`: explicación completa del flujo de Stripe y registro de compra.
 
 ---
 

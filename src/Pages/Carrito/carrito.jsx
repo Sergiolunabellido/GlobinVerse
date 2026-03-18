@@ -2,7 +2,6 @@ import Header from "../../Components/Header/header"
 import {useNavigate} from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { renovarToken } from "../../utils/utils";
-
 import toast from 'react-hot-toast';
 
 /**
@@ -21,6 +20,29 @@ export default function Carrito(){
      */
     const handleClickCatalogo = () => {
         navigate('/catalogo');
+    };
+
+    /**
+     * @brief Redirige a la página de checkout para procesar el pago.
+     * @fecha 2026-03-18
+     * @description Pasa el monto total como estado de navegación para que
+     * el checkout pueda crear el intento de pago con el monto correcto.
+     * @returns {void} No devuelve nada.
+     */
+    const manejarProcesarPago = () => {
+        // Verificamos que haya libros en el carrito
+        if (libros.length === 0) {
+            toast.error('Tu carrito está vacío');
+            return;
+        }
+
+        // Navegamos al checkout pasando el monto total
+        // El estado de navegación permite pasar datos entre páginas
+        navigate('/checkout', {
+            state: {
+                montoTotal: precioTotal // Pasamos el precio total calculado
+            }
+        });
     };
 
     const [libros, setLibros] = useState([]);
@@ -235,9 +257,13 @@ export default function Carrito(){
                                 <p className="text-base sm:text-lg md:text-xl text-gray-300">${precioTotal.toFixed(2)}</p>
                             </div>
                             <div id="divBotonesCompra" className="flex flex-col gap-3 sm:gap-4">
-                                <button id="botonComprar" className="bg-green-600 hover:bg-green-700 text-black text-base sm:text-lg md:text-xl font-bold py-2.5 sm:py-3 px-4 sm:px-6 md:px-8 rounded-[10px] transition duration-300 ease-in-out w-full">
-                                    Procesar Pago
-                                </button>
+                                <button
+                                id="botonComprar"
+                                onClick={manejarProcesarPago}
+                                className="bg-green-600 hover:bg-green-700 text-black text-base sm:text-lg md:text-xl font-bold py-2.5 sm:py-3 px-4 sm:px-6 md:px-8 rounded-[10px] transition duration-300 ease-in-out w-full"
+                            >
+                                Procesar Pago
+                            </button>
                                 <button id="botonSeguirComprando" onClick={handleClickCatalogo} className="text-green-600 hover:text-green-700 text-base sm:text-lg md:text-xl font-bold py-2 sm:py-3 transition duration-300 ease-in-out text-center">
                                     Continuar Compra
                                 </button>

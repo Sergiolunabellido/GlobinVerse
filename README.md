@@ -59,11 +59,13 @@ El objetivo es tener una base sólida para evolucionar hacia una **librería onl
 
 ---
 
-## 🆕 Novedades recientes (2026-03-17)
+## 🆕 Novedades recientes (2026-03-18)
 
 - **Página Sobre Nosotros** completa con historia, misión, visión y valores.
 - **Página Contacto** con email (redirige a Gmail), teléfono, dirección, redes sociales y horario.
 - **Carrito funcional completo**: listado, cantidades, totales, eliminación y cálculo de envío.
+- **Checkout con Stripe (modo test)**: creación de PaymentIntent + Stripe Elements + redirección a confirmación.
+- **Registro de compras tras pago exitoso**: inserción en tabla `compra` y control de `401` (login requerido).
 - **Tests implementados**: login, header, utils, funtionGenres y cerrarSesion.
 - **Responsive mejorado** en catálogo, perfil y páginas nuevas.
 - **Navegación por géneros** desde la home al catálogo filtrado.
@@ -122,6 +124,9 @@ flowchart LR
 - 📊 **web-vitals** — métricas de rendimiento.
 - 💅 **Tailwind CSS** `^3.4.19`.
 - 🍞 **react-hot-toast** — notificaciones toast.
+- 💳 **Stripe**:
+  - `@stripe/stripe-js`
+  - `@stripe/react-stripe-js`
 - Otros:
   - `i18next-browser-languagedetector` (preparado para i18n).
   - `jquery`
@@ -138,6 +143,7 @@ flowchart LR
 - 🐬 **mysql2/promise** — conexión con MySQL.
 - 📝 **dotenv** — gestión de variables de entorno.
 - 🌐 **axios** — usado en seeding de libros.
+- 💳 **stripe** — creación de PaymentIntents.
 - 🗄️ Preparado para sesiones en Redis:
   - `express-session`
   - `connect-redis`
@@ -390,7 +396,13 @@ Archivo: `backend/routes/auth.js`
 - `POST /anadirLibroCarrito` → añadir al carrito (**protegida**).
 - `POST /librosCarrito` → ver carrito (**protegida**).
 - `POST /eliminarLibroCarrito` → eliminar del carrito (**protegida**).
+- `POST /guardarLibroCarrito` → registrar compra de un libro (**protegida**).
+- `POST /registrarCompraCarrito` → registrar compras desde carrito (**protegida**).
 - `POST /cerrarSesion` → invalida refresh token y limpia cookie.
+
+Archivo: `backend/routes/pagos.js`
+
+- `POST /api/pagos/intentoPago` → crea un `PaymentIntent` y devuelve `client_secret`.
 
 <a id="middleware-de-autenticacion"></a>
 ### Middleware de autenticacion
@@ -470,7 +482,7 @@ Basado en las consultas reales del backend, el proyecto usa al menos estas tabla
 - `id_carrito` (PRIMARY KEY)
 - `id_user` (FK a `usuarios.id_usuario`)
 - `id_libro` (FK a `libros.id_libro`)
-- `cantidad`
+- `cantidad` (opcional; actualmente las cantidades se gestionan en frontend y el backend guarda 1 fila por libro)
 - `fecha`
 
 ---
@@ -505,13 +517,18 @@ Basado en las consultas reales del backend, el proyecto usa al menos estas tabla
 <a id="variables-de-entorno"></a>
 ## Variables de entorno
 
-Definidas en `backend/.env`.
+Definidas en `.env` (frontend) y `backend/.env` (backend).
 
 ```bash
+# Frontend (.env)
+REACT_APP_STRIPE_PUBLIC_KEY=pk_test_...
+
+# Backend (backend/.env)
 JWT_SECRET=tu_clave_super_secreta_para_access
 JWT_REFRESH_SECRET=tu_clave_super_secreta_para_refresh
 JWT_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
+STRIPE_SECRET_KEY=sk_test_...
 ```
 
 ---
@@ -579,7 +596,7 @@ npm test
 ## Roadmap y mejoras futuras
 
 ### Prioridad Alta
-- 🔴 **Stripe** — Integrar pagos reales.
+- 🔴 **Stripe (producción)** — Añadir webhook y verificación server-side (en modo test ya está el checkout).
 - 🔴 **Rutas privadas** — Proteger `/perfil` y `/carrito` con PrivateRoute.
 - 🔴 **AuthContext** — Implementar estado global de autenticación.
 
@@ -596,4 +613,3 @@ npm test
 ---
 
 Con todo lo anterior, este README documenta el estado actual del proyecto y las piezas nuevas ya implementadas.
-
