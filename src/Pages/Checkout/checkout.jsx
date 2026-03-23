@@ -102,12 +102,12 @@ export default function Checkout() {
     const opcionesApariencia = {
         clientSecret: secretoCliente,
         appearance: {
-            theme: 'night', // Tema oscuro que coincide con nuestra app
+            theme: 'night',
             variables: {
-                colorPrimary: '#22c55e',      // Verde principal
-                colorBackground: '#1a3a25',   // Fondo verde oscuro
-                colorText: '#ffffff',         // Texto blanco
-                colorDanger: '#ef4444',       // Rojo para errores
+                colorPrimary: '#22c55e',
+                colorBackground: '#1a3a25',
+                colorText: '#ffffff',    
+                colorDanger: '#ef4444',
                 fontFamily: 'system-ui, sans-serif',
                 spacingUnit: '4px',
                 borderRadius: '8px',
@@ -146,7 +146,7 @@ export default function Checkout() {
                     */
                     secretoCliente && (
                         <Elements stripe={instanciaStripe} options={opcionesApariencia}>
-                            <FormularioPago />
+                            <FormularioPago clientSecret={secretoCliente} />
                         </Elements>
                     )
                 )}

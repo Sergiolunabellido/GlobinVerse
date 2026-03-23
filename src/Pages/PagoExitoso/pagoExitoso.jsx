@@ -63,22 +63,22 @@ export default function PagoExitoso() {
             const checkoutLibros = checkoutLibrosRaw ? JSON.parse(checkoutLibrosRaw) : null;
 
             if (Array.isArray(checkoutLibros) && checkoutLibros.length > 0) {
-                for (const idLibro of checkoutLibros) {
-                    if (!idLibro) continue;
-                    const respuestaGuardar = await peticionProtegida('http://localhost:5000/guardarLibroCarrito', {
-                        id_libro: idLibro,
-                    });
-                    const datosGuardar = await respuestaGuardar.json().catch(() => null);
+                const respuestaGuardar = await peticionProtegida('http://localhost:5000/registrarCompraLibros', {
+                    libros: checkoutLibros,
+                    paymentIntentId,
+                });
+                const datosGuardar = await respuestaGuardar.json().catch(() => null);
 
-                    if (!respuestaGuardar.ok || datosGuardar?.ok === false) {
-                        throw new Error(datosGuardar?.mensaje || 'Error al registrar la compra');
-                    }
+                if (!respuestaGuardar.ok || datosGuardar?.ok === false) {
+                    throw new Error(datosGuardar?.mensaje || 'Error al registrar la compra');
                 }
                 sessionStorage.removeItem('checkout_libros');
                 return;
             }
 
-            const respuestaRegistrar = await peticionProtegida('http://localhost:5000/registrarCompraCarrito');
+            const respuestaRegistrar = await peticionProtegida('http://localhost:5000/registrarCompraCarrito', {
+                paymentIntentId,
+            });
             const datosRegistrar = await respuestaRegistrar.json().catch(() => null);
 
             if (!respuestaRegistrar.ok || datosRegistrar?.ok === false) {

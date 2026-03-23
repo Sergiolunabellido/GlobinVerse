@@ -1,4 +1,5 @@
-﻿require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const app = require('./app');
 
 const PORT = 5000;
@@ -11,6 +12,7 @@ app.listen(
    * @returns {void} No devuelve nada.
    */
   () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
   }
 );
+
