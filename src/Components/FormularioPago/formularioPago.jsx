@@ -49,22 +49,7 @@ export default function FormularioPago({ clientSecret }) {
       return;
     }
 
-    if (!correo.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) {
-      setMensajeError('Introduce un correo válido.');
-      return;
-    }
-
-    const telefonoLimpio = telefono.trim().replaceAll(' ', '');
-    if (!telefonoLimpio) {
-      setMensajeError('Introduce un número de teléfono.');
-      return;
-    }
-
-    if (!/^\d{6,15}$/.test(telefonoLimpio)) {
-      setMensajeError('Introduce un teléfono válido.');
-      return;
-    }
-
+   
     setProcesandoPago(true);
     setMensajeError('');
 
@@ -78,9 +63,6 @@ export default function FormularioPago({ clientSecret }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             paymentIntentId,
-            correo: correo.trim(),
-            telefono: `+34${telefonoLimpio}`,
-            nombre: nombre.trim(),
           }),
         }).catch(() => null);
       }
@@ -91,9 +73,7 @@ export default function FormularioPago({ clientSecret }) {
           return_url: `${window.location.origin}/pago-exitoso`,
           payment_method_data: {
             billing_details: {
-              email: correo.trim(),
-              phone: `+34${telefonoLimpio}`,
-              name: nombre.trim() || undefined,
+              
             },
           },
         },
