@@ -237,7 +237,7 @@ export default function Catalogo(){
                                             <Suspense fallback={null}>
                                                 <Libro3D libro={libro} />
                                             </Suspense>
-                                            <OrbitControls enableRotate={true} enablePan={false} />
+                                           <OrbitControls enableRotate={true} enablePan={false} enableZoom={false} />
                                         </Canvas>
                                     </div>
 
