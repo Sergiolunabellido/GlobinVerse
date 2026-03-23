@@ -10,8 +10,6 @@ const authMiddleware = require( '../middleware/auth.middleware');
 const {añadirLibroCarrito, librosCarrito, eliminarLibroCarrito} = require('../controllers/cartController')
 const router = express.Router();
 
-// El login no debe ir protegido con el middleware de auth,
-// porque precisamente se usa para obtener el primer token.
 
 router.post('/login', comprobarLogin);
 router.post('/register', registrarUsuario);
@@ -33,6 +31,7 @@ router.post('/eliminarLibroCarrito', authMiddleware ,eliminarLibroCarrito)
 router.post('/guardarLibroCarrito', authMiddleware, guardarLibroComprado)
 router.post('/registrarCompraCarrito', authMiddleware, registrarCompraDesdeCarrito)
 router.post('/registrarCompraLibros', authMiddleware, registrarCompraLibros)
+
 
 module.exports = router;
 

@@ -192,8 +192,8 @@ export default function Catalogo(){
                                 <span className='text-white/50 text-[1rem]'>Fantasia</span>
                             </label>
                             <label className='flex items-center gap-2'>
-                            <input type="checkbox" value='Ciencia Ficcion 'onChange={manejarCambioGenero} checked={generosSeleccionados.includes('Ciencia Ficcion ')}/>
-                                <span className='text-white/50 text-[1rem]'>Ciencia Ficción</span>
+                            <input type="checkbox" value='Ciencia ficción'onChange={manejarCambioGenero} checked={generosSeleccionados.includes('Ciencia ficción')}/>
+                                <span className='text-white/50 text-[1rem]'>Ciencia ficción</span>
                             </label>
                             <label className='flex items-center gap-2'>
                             <input type="checkbox" value='Misterio'onChange={manejarCambioGenero} checked={generosSeleccionados.includes('Misterio')}/>
@@ -241,14 +241,14 @@ export default function Catalogo(){
                                         </Canvas>
                                     </div>
 
-                                    <div className="mt-2 px-1">
-                                        <p className="font-semibold leading-tight truncate text-gray-300">
+                                    <div className="mt-2 px-1 gap-2 flex flex-col items-center">
+                                        <p className="font-semibold text-sm text-justify text-wrap leading-tight truncate text-gray-300">
                                             {libro.titulo ?? libro.titulo_libro ?? "Sin titulo"}
                                         </p>
-                                        <p className="text-sm text-gray-300 truncate">
+                                        <p className="text-sm  text-justify text-wrap text-gray-300 truncate">
                                             {libro.autor ?? libro.autor_libro ?? "Autor desconocido"}
                                         </p>
-                                        <p className="text-sm text-gray-400 truncate">
+                                        <p className="text-sm  text-justify text-wrap text-gray-400 truncate">
                                             {libro.editorial ?? libro.editorial_libro ?? "Editorial desconocida"}
                                         </p>
                                     </div>

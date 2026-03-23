@@ -12,6 +12,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.13.6",
     "cookie-parser": "^1.4.7",
     "i18next-browser-languagedetector": "^8.2.1",
     "jquery": "^4.0.0",

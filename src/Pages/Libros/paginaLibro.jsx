@@ -265,7 +265,7 @@ export default function PageBook(){
     if (!libro) return <p>Cargando...</p>;
 
     const precioLibro = Number.parseFloat(String(libro.precio).replace(',', '.'));
-    const precioOriginal = (Number.isFinite(precioLibro) ? precioLibro : 0) + 10;
+    const precioOriginal = Number(((Number.isFinite(precioLibro) ? precioLibro : 0) + 10).toFixed(4));
 
     return (
         <div className="body1 overflow-x-hidden flex flex-col items-center w-screen h-full bg-[#102216] text-gray-300 ">
