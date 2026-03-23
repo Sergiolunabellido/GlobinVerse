@@ -590,25 +590,6 @@ Ejecución:
 npm test
 ```
 
----
-
-<a id="roadmap-y-mejoras-futuras"></a>
-## Roadmap y mejoras futuras
-
-### Prioridad Alta
-- 🔴 **Stripe (producción)** — Añadir webhook y verificación server-side (en modo test ya está el checkout).
-- 🔴 **Rutas privadas** — Proteger `/perfil` y `/carrito` con PrivateRoute.
-- 🔴 **AuthContext** — Implementar estado global de autenticación.
-
-### Prioridad Media
-- 🟡 **Buscador global** — Integrar en todas las vistas.
-- 🟡 **Validaciones** — Mejorar validación de formularios.
-- 🟡 **Optimización 3D** — Lazy loading y mejoras en móviles.
-
-### Prioridad Baja
-- 🟢 **Rate limiting** — Seguridad en backend.
-- 🟢 **HTTPS** — Preparar para producción.
-- 🟢 **Despliegue** — Frontend + backend + DB.
 
 ---
 
