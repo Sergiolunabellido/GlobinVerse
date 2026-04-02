@@ -364,6 +364,84 @@ async function librosFiltradosGenero(req, res) {
 }
 
 
+//FUNCIONES LIBROS SUBIDOS POR EL USUARIO
+async function subirLibroPropio(req, res) {
+        const {isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, cantidad_paginas, fecha_publicacion} = req.body;
+
+        let conexion = null;
+
+        try{
+            conexion = await conexionBD();
+            const [resultado] = await conexion.execute(
+                'INSERT INTO libros (isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, paginas, publicacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
+                [isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, cantidad_paginas, fecha_publicacion]
+            );
+            if (resultado.affectedRows === 0) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: "No se pudo subir el libro, intente de nuevo"
+                });
+            }
+
+            const[librosUsuario] = await conexion.execute('Insert into librosUsuario (id_user, id_libro) VALUES (?, ?)', [req.id_usuario, resultado.insertId]);
+ 
+            if (librosUsuario.affectedRows === 0) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: "No se pudo asociar el libro al usuario, intente de nuevo"
+                });
+            }
+            return res.status(200).json({
+                ok: true,
+                mensaje: 'libro subido con exito'
+            });
+        }catch(e){
+            console.error('Error al subir libro propio:', e);
+            return res.status(500).json({
+                ok: false,
+                mensaje: "Error interno del servidor"
+            });
+        }
+}
+
+async function librosUsuario(req,res){
+    const id_usuario = req.id_usuario;
+    let conexion;
+
+    try{
+        conexion = await conexionBD();
+        const [libros] = await conexion.execute('SELECT * FROM libros WHERE id_user IN (SELECT id_libro FROM librosUsuario WHERE id_user = ?)', [id_usuario]);
+        return res.status(200).json({ ok: true, filas: libros });
+    }catch(e){
+        console.error('Error al obtener los libros del usuario:', e);
+        return res.status(500).json({
+            ok: false,
+            mensaje: "Error interno del servidor"
+        });
+    } finally {
+        if (conexion) await conexion.end();
+    }
+}
+
+async function librosUsuarioComprador(req,res){
+    const id_usuario = req.id_usuario;
+    let conexion;
+
+    try{
+        conexion = await conexionBD();
+        const [filas] = await conexion.execute('SELECT * FROM compras where id_libro in (select id_libro from librosUsuario where id_user = ?)', [id_usuario]);
+        return res.status(200).json({ ok: true, filas: filas });
+    }catch(e){
+        console.error('Error al obtener los libros comprados de este usuario:', e);
+        return res.status(500).json({
+            ok: false,
+            mensaje: "Error al obtener los libros comprados de este usuario"
+        });
+    } finally {
+        if (conexion) await conexion.end();
+    }
+}
+
 module.exports= {
     anadirFavorito,
     librosFavoritosUser,
@@ -374,5 +452,8 @@ module.exports= {
     librosCompletos,
     librosFiltradosGenero,
     libroId,
-    libroTitulo
+    libroTitulo,
+    librosUsuarioComprador,
+    librosUsuario,
+    subirLibroPropio
 }

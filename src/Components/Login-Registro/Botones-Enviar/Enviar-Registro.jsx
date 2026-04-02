@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -6,12 +6,11 @@ import { useNavigate } from 'react-router-dom';
  * @fecha 2026-01-12
  * @returns {JSX.Element} Boton y mensajes de estado.
  */
-export default function BotonEnviarRegistro({nombre, email, password}){
+export default function BotonEnviarRegistro({nombre, email, password, setContraseña, setEmail, setNombre}){
 
     const [error, setError] = useState('');
     const [correcto, setCorrecto] = useState('');
-    const navigate = useNavigate();
-
+    
     /**
      * @brief Envia los datos de registro y redirige si todo va bien.
      * @fecha 2026-01-12
@@ -33,9 +32,12 @@ export default function BotonEnviarRegistro({nombre, email, password}){
             });
             const datos = await respuesta.json();
             if(datos.ok){
+                setError('');
+                setContraseña('');
+                setEmail('');
+                setNombre('');
                 setCorrecto(datos.mensaje);
-                console.log(datos.mensaje);
-                navigate('/login');
+                window.location.reload();
             }else{
                 setError(datos.mensaje);
             }

@@ -5,7 +5,7 @@ const { registrarUsuario } = require('../controllers/registerController');
 const { refreshAccessToken } = require('../controllers/refreshTokenController')
 const {listarUsuariosId, cerrarSesion} = require('../controllers/usersController')
 const {guardarLibroComprado, registrarCompraDesdeCarrito, registrarCompraLibros} = require('../controllers/compraController')
-const {libros, libroId, libroTitulo, librosCompletos,librosFavoritosUser, librosCompradosUser, eliminarFavoritoPorId, librosFiltradosGenero, anadirFavorito} = require('../controllers/librosController')
+const {libros, libroId, libroTitulo, librosCompletos,librosFavoritosUser, librosCompradosUser, eliminarFavoritoPorId, librosFiltradosGenero, anadirFavorito, subirLibroPropio, librosUsuarioComprador,librosUsuario} = require('../controllers/librosController')
 const authMiddleware = require( '../middleware/auth.middleware');
 const {añadirLibroCarrito, librosCarrito, eliminarLibroCarrito} = require('../controllers/cartController')
 const router = express.Router();
@@ -31,7 +31,9 @@ router.post('/eliminarLibroCarrito', authMiddleware ,eliminarLibroCarrito)
 router.post('/guardarLibroCarrito', authMiddleware, guardarLibroComprado)
 router.post('/registrarCompraCarrito', authMiddleware, registrarCompraDesdeCarrito)
 router.post('/registrarCompraLibros', authMiddleware, registrarCompraLibros)
-
+router.post('/subirLibroPropio', authMiddleware, subirLibroPropio)
+router.post('/librosUsuarioComprador', authMiddleware, librosUsuarioComprador)
+router.post('/librosUsuario', authMiddleware, librosUsuario)
 
 module.exports = router;
 

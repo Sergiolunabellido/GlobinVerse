@@ -4,12 +4,24 @@
  * @returns {JSX.Element} Botones para cambiar de vista.
  */
 export default function InicioRegistro({ isLoginView, setIsLoginView }) {
+    const handleLoginClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsLoginView(true);
+    };
+
+    const handleRegistroClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsLoginView(false);
+    };
+
     return (
         <div className="opciones flex justify-center items-center w-[100%] m-auto h-[5vh]">
             {/* Botón Iniciar Sesión */}
             <button 
                 className="boton-login  h-[3.5vh] w-[50%] text-center m-[1.5vw]"
-                onClick={() => setIsLoginView(true)}
+                onClick={handleLoginClick}
                 style={{ backgroundColor: isLoginView ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}
             >
                 Iniciar Sesión
@@ -18,7 +30,7 @@ export default function InicioRegistro({ isLoginView, setIsLoginView }) {
             {/* Botón Registrarse */}
             <button 
                 className="boton-registro h-[3.5vh] w-[50%]  text-center m-[1.5vw]"
-                onClick={() => setIsLoginView(false)}
+                onClick={handleRegistroClick}
                 style={{ backgroundColor: !isLoginView ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}
             >
                 Registrarse

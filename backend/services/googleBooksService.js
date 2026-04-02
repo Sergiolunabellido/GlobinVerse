@@ -62,7 +62,8 @@ async function fetchAndInsertBooks() {
         try {
           console.log(`Buscando libros para: ${query}`);
           const response = await axios.get(
-            `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=40`
+            `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=40`,
+            { timeout: 15000 }
           );
           const books = response.data.items;
           if (!books) break;
@@ -121,11 +122,11 @@ async function fetchAndInsertBooks() {
         } catch (error) {
           console.error(`Error fetch query "${query}", reintentando (${retries - 1} retries)`);
           retries--;
-          await new Promise((r) => setTimeout(r, 2000));
+          await new Promise((r) => setTimeout(r, 15000)); // 15 segundos entre reintentos
         }
       }
 
-      await new Promise((r) => setTimeout(r, 1000)); // retardo entre queries
+      await new Promise((r) => setTimeout(r, 12000)); // 12 segundos entre queries
     }
   } catch (error) {
     console.error('Error conectando a la base de datos:', error.message);
