@@ -366,16 +366,52 @@ async function librosFiltradosGenero(req, res) {
 
 //FUNCIONES LIBROS SUBIDOS POR EL USUARIO
 async function subirLibroPropio(req, res) {
-        const {isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, cantidad_paginas, fecha_publicacion} = req.body;
+        const {isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, paginas,publicacion} = req.body;
 
         let conexion = null;
+        console.log('Datos recibidos para subir libro propio:', {
+            isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, paginas, publicacion
+        });
 
         try{
+            // Validar que todos los campos requeridos están presentes
+            if (!isbn || !titulo || !autor || !categoria || !precio || !existencias) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: "Faltan campos requeridos: isbn, titulo, autor, categoria, precio, existencias"
+                });
+            }
+
+            if (!req.id_usuario) {
+                return res.status(401).json({
+                    ok: false,
+                    mensaje: "Usuario no identificado"
+                });
+            }
+
             conexion = await conexionBD();
+            
+            if (!conexion) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: "No se pudo conectar a la base de datos"
+                });
+            }
+
+            const [existe] = await conexion.execute('Select * from libros where titulo = ?', [titulo]);
+
+            if (existe.length > 0) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: "Ya existe un libro con ese titulo, por favor elige otro titulo"
+                });
+            }
+
             const [resultado] = await conexion.execute(
-                'INSERT INTO libros (isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, paginas, publicacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
-                [isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, cantidad_paginas, fecha_publicacion]
+                'INSERT INTO libros (isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, paginas, publicacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, paginas, publicacion]
             );
+
             if (resultado.affectedRows === 0) {
                 return res.status(400).json({
                     ok: false,
@@ -383,24 +419,31 @@ async function subirLibroPropio(req, res) {
                 });
             }
 
-            const[librosUsuario] = await conexion.execute('Insert into librosUsuario (id_user, id_libro) VALUES (?, ?)', [req.id_usuario, resultado.insertId]);
- 
-            if (librosUsuario.affectedRows === 0) {
-                return res.status(400).json({
-                    ok: false,
-                    mensaje: "No se pudo asociar el libro al usuario, intente de nuevo"
-                });
-            }
+            // Insertar en librosusuario para relacionar el libro con el usuario
+            await conexion.execute(
+                'INSERT INTO librosusuario (id_user, id_libro) VALUES (?, ?)',
+                [req.id_usuario, resultado.insertId]
+            );
+
             return res.status(200).json({
                 ok: true,
-                mensaje: 'libro subido con exito'
+                mensaje: 'libro subido con exito',
+                id_libro: resultado.insertId
             });
         }catch(e){
             console.error('Error al subir libro propio:', e);
             return res.status(500).json({
                 ok: false,
-                mensaje: "Error interno del servidor"
+                mensaje: "Error interno del servidor: " + e.message
             });
+        } finally {
+            if (conexion) {
+                try {
+                    await conexion.end();
+                } catch (e) {
+                    console.error('Error al cerrar conexión:', e);
+                }
+            }
         }
 }
 
@@ -410,8 +453,11 @@ async function librosUsuario(req,res){
 
     try{
         conexion = await conexionBD();
-        const [libros] = await conexion.execute('SELECT * FROM libros WHERE id_user IN (SELECT id_libro FROM librosUsuario WHERE id_user = ?)', [id_usuario]);
-        return res.status(200).json({ ok: true, filas: libros });
+        const [libros] = await conexion.execute(
+            'SELECT l.* FROM libros l INNER JOIN librosusuario lu ON l.id_libro = lu.id_libro WHERE lu.id_user = ?',
+            [id_usuario]
+        );
+        return res.status(200).json({ ok: true, libros: libros });
     }catch(e){
         console.error('Error al obtener los libros del usuario:', e);
         return res.status(500).json({
@@ -442,6 +488,159 @@ async function librosUsuarioComprador(req,res){
     }
 }
 
+/**
+ * @brief Elimina un libro propio del usuario.
+ * @fecha 2026-04-15
+ * @returns {Promise<void>} Respuesta JSON con resultado.
+ */
+async function eliminarLibroPropio(req, res) {
+    const id_usuario = req.id_usuario;
+    const { id_libro } = req.body;
+    let conexion;
+
+    try {
+        if (!id_libro) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "ID del libro requerido"
+            });
+        }
+
+        conexion = await conexionBD();
+
+        // Verificar que el libro pertenezca al usuario
+        const [libroUsuario] = await conexion.execute(
+            'SELECT id_libro FROM librosusuario WHERE id_libro = ? AND id_user = ?',
+            [id_libro, id_usuario]
+        );
+
+        if (libroUsuario.length === 0) {
+            return res.status(403).json({
+                ok: false,
+                mensaje: "No tienes permiso para eliminar este libro"
+            });
+        }
+
+        // Eliminar la relación en librosusuario primero
+        await conexion.execute(
+            'DELETE FROM librosusuario WHERE id_libro = ? AND id_user = ?',
+            [id_libro, id_usuario]
+        );
+
+        // Eliminar el libro de la tabla libros
+        const [resultado] = await conexion.execute(
+            'DELETE FROM libros WHERE id_libro = ?',
+            [id_libro]
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: "No se encontró el libro"
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            mensaje: "Libro eliminado exitosamente"
+        });
+    } catch (e) {
+        console.error('Error al eliminar libro propio:', e);
+        return res.status(500).json({
+            ok: false,
+            mensaje: "Error interno del servidor"
+        });
+    } finally {
+        if (conexion) await conexion.end();
+    }
+}
+
+/**
+ * @brief Edita un libro propio del usuario.
+ * @fecha 2026-04-15
+ * @returns {Promise<void>} Respuesta JSON con resultado.
+ */
+async function editarLibroPropio(req, res) {
+    const id_usuario = req.id_usuario;
+    const { id_libro, isbn, titulo, autor, categoria, editorial, existencias, url_imagen, descripcion, idioma, precio, paginas, publicacion } = req.body;
+    let conexion;
+
+    try {
+        if (!id_libro) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "ID del libro requerido"
+            });
+        }
+
+        conexion = await conexionBD();
+
+        // Verificar que el libro pertenezca al usuario
+        const [libroUsuario] = await conexion.execute(
+            'SELECT id_libro FROM librosusuario WHERE id_libro = ? AND id_user = ?',
+            [id_libro, id_usuario]
+        );
+
+        if (libroUsuario.length === 0) {
+            return res.status(403).json({
+                ok: false,
+                mensaje: "No tienes permiso para editar este libro"
+            });
+        }
+
+        // Construir la query dinámicamente solo con los campos proporcionados
+        const campos = [];
+        const valores = [];
+
+        if (isbn !== undefined) { campos.push('isbn = ?'); valores.push(isbn); }
+        if (titulo !== undefined) { campos.push('titulo = ?'); valores.push(titulo); }
+        if (autor !== undefined) { campos.push('autor = ?'); valores.push(autor); }
+        if (categoria !== undefined) { campos.push('categoria = ?'); valores.push(categoria); }
+        if (editorial !== undefined) { campos.push('editorial = ?'); valores.push(editorial); }
+        if (existencias !== undefined) { campos.push('existencias = ?'); valores.push(existencias); }
+        if (url_imagen !== undefined) { campos.push('url_imagen = ?'); valores.push(url_imagen); }
+        if (descripcion !== undefined) { campos.push('descripcion = ?'); valores.push(descripcion); }
+        if (idioma !== undefined) { campos.push('idioma = ?'); valores.push(idioma); }
+        if (precio !== undefined) { campos.push('precio = ?'); valores.push(precio); }
+        if (paginas !== undefined) { campos.push('paginas = ?'); valores.push(paginas); }
+        if (publicacion !== undefined) { campos.push('publicacion = ?'); valores.push(publicacion); }
+
+        if (campos.length === 0) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "No se proporcionaron campos para actualizar"
+            });
+        }
+
+        valores.push(id_libro);
+
+        const [resultado] = await conexion.execute(
+            `UPDATE libros SET ${campos.join(', ')} WHERE id_libro = ?`,
+            valores
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: "No se encontró el libro o no hubo cambios"
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            mensaje: "Libro actualizado exitosamente"
+        });
+    } catch (e) {
+        console.error('Error al editar libro propio:', e);
+        return res.status(500).json({
+            ok: false,
+            mensaje: "Error interno del servidor"
+        });
+    } finally {
+        if (conexion) await conexion.end();
+    }
+}
+
 module.exports= {
     anadirFavorito,
     librosFavoritosUser,
@@ -455,5 +654,7 @@ module.exports= {
     libroTitulo,
     librosUsuarioComprador,
     librosUsuario,
-    subirLibroPropio
+    subirLibroPropio,
+    eliminarLibroPropio,
+    editarLibroPropio
 }

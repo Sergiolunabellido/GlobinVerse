@@ -103,7 +103,7 @@ export default function Contacto(){
                 </div>
 
                 {/* Seccion de horario */}
-                <div className='flex flex-col items-center justify-center w-full py-10 px-4 bg-[#1a3a25]/15'>
+                    <div className='flex flex-col items-center justify-center w-full py-10 px-4 bg-[#1a3a25]/15'>
                     <div className='flex flex-col items-center gap-6 w-full md:w-[80%] lg:w-[60%] max-w-[800px] bg-[#1a3a25]/30 rounded-xl ring-1 ring-green-900 shadow p-6 md:p-10'>
                         <div className='w-14 h-14 bg-[#1a3a25] rounded-xl flex items-center justify-center'>
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00ff33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

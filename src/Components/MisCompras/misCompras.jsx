@@ -77,10 +77,10 @@ export default function MisCompras(){
                     {compras.map((libro, index) => (
                         <div
                             key={`${libro.id_libro ?? "libro"}-${index}`} 
-                            className="flex items-center justify-between  w-[100%] h-[25%] border-green border-2  shadow-md shadow-green-600/70 rounded-2xl m-3 p-2"
+                            className="flex items-center justify-between  w-[100%] h-[30%] border-green border-2  shadow-md shadow-green-600/70 rounded-2xl m-3 p-2"
                                 style={{ cursor: "pointer" }}
                             >
-                                <div className="flex items-center gap-2 m-3 w-[30%]">
+                                <div className="flex gap-2 m-3 w-[30%] items-center justify-start">
                                      <Canvas
                                         frameloop="demand"
                                         dpr={[1.6, 1.5]}
@@ -94,7 +94,7 @@ export default function MisCompras(){
                                         </Suspense>
                                         <OrbitControls enableRotate={true} enablePan={false} />
                                     </Canvas>
-                                    <div id="datosLibroCompra" className="flex flex-col gap-1 m-2 items-start w-[100%]">
+                                    <div id="datosLibroCompra" className="flex flex-col gap-1 m-2 items-center w-[100%] justify-center">
                                         <p>ISBN: {libro.isbn}</p>
                                         <p>Titulo: {libro.titulo}</p>
                                         <p>Categoria: {libro.categoria}</p>
