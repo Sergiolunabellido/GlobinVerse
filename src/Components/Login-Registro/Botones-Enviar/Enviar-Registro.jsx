@@ -85,6 +85,6 @@ export default function BotonEnviarRegistro({ nombre, email, password, setContra
     };
 
     return (
-        <button type='button' className="btn-submit" onClick={enviarRegistro}>Enviar</button>
+        <button type='button' className="btn-submit m-10" onClick={enviarRegistro}>Enviar</button>
     );
 }
