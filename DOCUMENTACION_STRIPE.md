@@ -83,17 +83,16 @@ Archivo: `backend/controllers/compraController.js`
 
 Funciones relevantes:
 
-1. `guardarLibroComprado(req, res)`
-   - Inserta **un** libro en la tabla `compra`:
-     - `INSERT INTO compra (id_user, id_libro) VALUES (?, ?)`
-   - Es idempotente:
-     - si ya existía `(id_user, id_libro)`, responde `200` con `{ ok: true, duplicado: true }` (evita errores por duplicados).
-
-2. `registrarCompraDesdeCarrito(req, res)`
-   - Lee los `id_libro` del carrito del usuario:
-     - `SELECT id_libro FROM carrito WHERE id_user = ?`
-   - Inserta en `compra` solo los que no existan ya.
+1. `registrarCompraDesdeCarrito(req, res)`
+   - Lee los `id_libro` del carrito del usuario.
+   - Inserta en `compra` y, si aplica, añade `id_user_libro`.
    - Usa transacción (`beginTransaction/commit/rollback`) para asegurar consistencia.
+
+2. `registrarCompraLibros(req, res)`
+   - Recibe una lista de libros desde el frontend: `{ libros: [id1, id2, ...] }`.
+   - Inserta cada libro en `compra` y, si existe en `librosusuario`, también guarda `id_user_libro`.
+   - Elimina del carrito los IDs que vienen en la petición.
+   - Usa transacción (`beginTransaction/commit/rollback`).
 
 > Importante: se corrigió el nombre de la tabla usada en los inserts.
 > En el proyecto, para listar compras ya se usaba `compra` (singular) en `backend/controllers/librosController.js`,
@@ -105,8 +104,8 @@ Archivo: `backend/routes/auth.js`
 
 Se usan endpoints protegidos con `authMiddleware`:
 
-- `POST /guardarLibroCarrito` → llama a `guardarLibroComprado`
 - `POST /registrarCompraCarrito` → llama a `registrarCompraDesdeCarrito`
+- `POST /registrarCompraLibros` → llama a `registrarCompraLibros`
 
 Además se corrigió un typo que impedía registrar la ruta:
 
@@ -130,8 +129,8 @@ Cuando el pago es `succeeded`, el frontend intenta registrar la compra:
 3. Se distinguen 2 casos:
 
 **A) Compra desde ficha de libro**
-- Si existe `sessionStorage.checkout_libros`, se recorre y se llama:
-  - `POST /guardarLibroCarrito` con `{ id_libro }`
+- Si existe `sessionStorage.checkout_libros`, se llama:
+  - `POST /registrarCompraLibros` con `{ libros: [id1, id2, ...] }`
 - Al terminar se borra `checkout_libros`.
 
 **B) Compra desde carrito**

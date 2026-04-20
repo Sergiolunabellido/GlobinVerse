@@ -10,13 +10,20 @@ async function crearLibro(isbn, titulo, autor, precio, stock) {
     let conexion;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [resultado] = await conexion.execute(
             'INSERT INTO libros (isbn, titulo, autor, precio, stock) VALUES (?, ?, ?, ?, ?)',
             [isbn, titulo, autor, precio, stock]
         );
         console.log('Libro insertado en la BD:', resultado);
+        await conexion.commit();
         return resultado;
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al insertar libro:', e);
         throw e;
     } finally {
@@ -33,9 +40,11 @@ async function libros(req, res) {
     let conexion;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [filas] = await conexion.execute('SELECT * FROM libros LIMIT 6');
 
         if(filas.length === 0){
+            await conexion.commit();
             return res.status(404).json({
                 ok: false,
                 mensaje: "No se han encontrado libros en la base de datos"
@@ -43,11 +52,17 @@ async function libros(req, res) {
             
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: filas
         }) 
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros de la BD:', e);
 
     } finally {
@@ -65,9 +80,11 @@ async function libroId(req, res) {
     let {id_libro} = req.body;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [filas] = await conexion.execute('SELECT * FROM libros where id_libro = ?', [id_libro]);
 
         if(filas.length === 0){
+            await conexion.commit();
             return res.status(404).json({
                 ok: false,
                 mensaje: "No se han encontrado libros en la base de datos"
@@ -75,11 +92,17 @@ async function libroId(req, res) {
             
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: filas
         }) 
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros de la BD:', e);
 
     } finally {
@@ -98,9 +121,11 @@ async function libroTitulo(req, res) {
     let {titulo_libro} = req.body;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [filas] = await conexion.execute('SELECT * FROM libros where LOWER(titulo) LIKE LOWER(?)', [`%${titulo_libro}%`]);
 
         if(filas.length === 0){
+            await conexion.commit();
             return res.status(404).json({
                 ok: false,
                 mensaje: `No se han encontrado el libro con titulo: ${titulo_libro} en la base de datos`
@@ -108,11 +133,17 @@ async function libroTitulo(req, res) {
             
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: filas
         }) 
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros de la BD:', e);
         return res.status(500).json({
             ok: false,
@@ -134,9 +165,11 @@ async function librosCompletos(req, res) {
     let conexion;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [filas] = await conexion.execute('SELECT * FROM libros');
 
         if(filas.length === 0){
+            await conexion.commit();
             return res.status(404).json({
                 ok: false,
                 mensaje: "No se han encontrado libros en la base de datos"
@@ -144,11 +177,17 @@ async function librosCompletos(req, res) {
             return
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: filas
         }) 
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros de la BD:', e);
         throw e;
     } finally {
@@ -168,6 +207,7 @@ async function librosFavoritosUser(req, res) {
     let conexion;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [filas] = await conexion.execute(`
             SELECT 
                 f.id_favorito,
@@ -188,6 +228,7 @@ async function librosFavoritosUser(req, res) {
         );
 
         if(filas.length === 0){
+            await conexion.commit();
             return res.status(404).json({
                 ok: false,
                 mensaje: "No se han encontrado libros favoritos para este usuario"
@@ -195,11 +236,17 @@ async function librosFavoritosUser(req, res) {
             
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: filas
         })
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros favoritos de la BD:', e);
         return res.status(500).json({
             ok: false,
@@ -229,12 +276,14 @@ async function anadirFavorito(req, res){
     let conexion;
     try{
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [existe] = await conexion.execute(
             'SELECT id_favorito FROM favoritos WHERE id_user = ? AND id_libro = ? LIMIT 1',
             [id_usuario, id_libro]
         );
 
         if (existe.length > 0) {
+            await conexion.commit();
             return res.status(200).json({
                 ok: true,
                 mensaje: "El libro ya estaba en favoritos"
@@ -246,11 +295,17 @@ async function anadirFavorito(req, res){
             [id_usuario, id_libro]
         );
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             resultado
         });
     }catch(e){
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al añadir favorito:', e);
         return res.status(500).json({
             ok: false,
@@ -271,23 +326,33 @@ async function eliminarFavoritoPorId(req,res) {
     let conexion;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [filas] = await conexion.execute(
             'SELECT id_favorito FROM favoritos WHERE id_favorito = ?',
             [id_favorito]
         );
 
-        if (filas.length === 0) return null;
+        if (filas.length === 0) {
+            await conexion.commit();
+            return null;
+        }
 
         const [resultado] = await conexion.execute(
             'DELETE FROM favoritos WHERE id_favorito = ?',
             [id_favorito]
         );
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: resultado
         })
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al eliminar favorito por id:', e);
         throw e;
     } finally {
@@ -307,21 +372,29 @@ async function librosCompradosUser(req, res){
     let conexion;
     try {
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [filas] = await conexion.execute('SELECT c.id_compra, l.categoria, l.titulo, l.isbn, l.editorial, l.url_imagen, c.fecha '
             + 'from compra c join usuarios u on c.id_user = u.id_usuario JOIN libros l ON c.id_libro = l.id_libro where id_usuario = ?', [id_usuario]);
 
         if(filas.length === 0){
+            await conexion.commit();
             return res.status(400).json({
                 ok: false,
                 mensaje: "No se han encontrado libros comprados para este usuario"
             })
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: filas
         })
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros comprados de la BD:', e);
         return res.status(500).json({
             ok: false,
@@ -344,6 +417,7 @@ async function librosFiltradosGenero(req, res) {
   try {
     const listaCategorias = req.body.listaCategorias || [];
     conexion = await conexionBD();
+    await conexion.beginTransaction();
 
     let sentencia = "SELECT * FROM libros";
     let parametrosWhere = [];
@@ -355,8 +429,14 @@ async function librosFiltradosGenero(req, res) {
     }
 
     const [filas] = await conexion.execute(sentencia, parametrosWhere);
+    await conexion.commit();
     return res.status(200).json({ ok: true, filas });
   } catch (e) {
+    if (conexion) {
+      try {
+        await conexion.rollback();
+      } catch (_) {}
+    }
     return res.status(500).json({ ok: false, mensaje: "Error interno" });
   } finally {
     if (conexion) await conexion.end();
@@ -397,10 +477,12 @@ async function subirLibroPropio(req, res) {
                     mensaje: "No se pudo conectar a la base de datos"
                 });
             }
+            await conexion.beginTransaction();
 
             const [existe] = await conexion.execute('Select * from libros where titulo = ?', [titulo]);
 
             if (existe.length > 0) {
+                await conexion.commit();
                 return res.status(400).json({
                     ok: false,
                     mensaje: "Ya existe un libro con ese titulo, por favor elige otro titulo"
@@ -413,6 +495,7 @@ async function subirLibroPropio(req, res) {
             );
 
             if (resultado.affectedRows === 0) {
+                await conexion.commit();
                 return res.status(400).json({
                     ok: false,
                     mensaje: "No se pudo subir el libro, intente de nuevo"
@@ -425,12 +508,18 @@ async function subirLibroPropio(req, res) {
                 [req.id_usuario, resultado.insertId]
             );
 
+            await conexion.commit();
             return res.status(200).json({
                 ok: true,
                 mensaje: 'libro subido con exito',
                 id_libro: resultado.insertId
             });
         }catch(e){
+            if (conexion) {
+                try {
+                    await conexion.rollback();
+                } catch (_) {}
+            }
             console.error('Error al subir libro propio:', e);
             return res.status(500).json({
                 ok: false,
@@ -453,12 +542,19 @@ async function librosUsuario(req,res){
 
     try{
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [libros] = await conexion.execute(
             'SELECT l.* FROM libros l INNER JOIN librosusuario lu ON l.id_libro = lu.id_libro WHERE lu.id_user = ?',
             [id_usuario]
         );
+        await conexion.commit();
         return res.status(200).json({ ok: true, libros: libros });
     }catch(e){
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros del usuario:', e);
         return res.status(500).json({
             ok: false,
@@ -475,9 +571,16 @@ async function librosUsuarioComprador(req,res){
 
     try{
         conexion = await conexionBD();
-        const [filas] = await conexion.execute('SELECT * FROM compras where id_libro in (select id_libro from librosUsuario where id_user = ?)', [id_usuario]);
+        await conexion.beginTransaction();
+        const [filas] = await conexion.execute('SELECT * FROM compra where id_user_libro = ?', [id_usuario]);
+        await conexion.commit();
         return res.status(200).json({ ok: true, filas: filas });
     }catch(e){
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al obtener los libros comprados de este usuario:', e);
         return res.status(500).json({
             ok: false,
@@ -507,6 +610,7 @@ async function eliminarLibroPropio(req, res) {
         }
 
         conexion = await conexionBD();
+        await conexion.beginTransaction();
 
         // Verificar que el libro pertenezca al usuario
         const [libroUsuario] = await conexion.execute(
@@ -515,6 +619,7 @@ async function eliminarLibroPropio(req, res) {
         );
 
         if (libroUsuario.length === 0) {
+            await conexion.commit();
             return res.status(403).json({
                 ok: false,
                 mensaje: "No tienes permiso para eliminar este libro"
@@ -534,17 +639,24 @@ async function eliminarLibroPropio(req, res) {
         );
 
         if (resultado.affectedRows === 0) {
+            await conexion.commit();
             return res.status(404).json({
                 ok: false,
                 mensaje: "No se encontró el libro"
             });
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             mensaje: "Libro eliminado exitosamente"
         });
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al eliminar libro propio:', e);
         return res.status(500).json({
             ok: false,
@@ -574,6 +686,7 @@ async function editarLibroPropio(req, res) {
         }
 
         conexion = await conexionBD();
+        await conexion.beginTransaction();
 
         // Verificar que el libro pertenezca al usuario
         const [libroUsuario] = await conexion.execute(
@@ -582,6 +695,7 @@ async function editarLibroPropio(req, res) {
         );
 
         if (libroUsuario.length === 0) {
+            await conexion.commit();
             return res.status(403).json({
                 ok: false,
                 mensaje: "No tienes permiso para editar este libro"
@@ -606,6 +720,7 @@ async function editarLibroPropio(req, res) {
         if (publicacion !== undefined) { campos.push('publicacion = ?'); valores.push(publicacion); }
 
         if (campos.length === 0) {
+            await conexion.commit();
             return res.status(400).json({
                 ok: false,
                 mensaje: "No se proporcionaron campos para actualizar"
@@ -620,17 +735,24 @@ async function editarLibroPropio(req, res) {
         );
 
         if (resultado.affectedRows === 0) {
+            await conexion.commit();
             return res.status(404).json({
                 ok: false,
                 mensaje: "No se encontró el libro o no hubo cambios"
             });
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             mensaje: "Libro actualizado exitosamente"
         });
     } catch (e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.error('Error al editar libro propio:', e);
         return res.status(500).json({
             ok: false,

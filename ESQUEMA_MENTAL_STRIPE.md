@@ -159,8 +159,8 @@ El frontend distingue 2 escenarios:
 **A) Compra desde ficha de libro**
 
 - Si existe `sessionStorage.checkout_libros`:
-  - Recorre ids y llama:
-    - `POST /guardarLibroCarrito` con `{ id_libro }`
+  - Toma todos los ids y llama:
+    - `POST /registrarCompraLibros` con `{ libros: [id1, id2, ...] }`
   - Al terminar:
     - borra `checkout_libros`
 
@@ -186,8 +186,8 @@ El frontend distingue 2 escenarios:
 
 - Archivo: `backend/routes/auth.js`
 - Endpoints protegidos con `authMiddleware`:
-  - `POST /guardarLibroCarrito` → `guardarLibroComprado()`
   - `POST /registrarCompraCarrito` → `registrarCompraDesdeCarrito()`
+  - `POST /registrarCompraLibros` → `registrarCompraLibros()`
 
 ### 6.2 Middleware JWT
 
@@ -206,23 +206,7 @@ El frontend distingue 2 escenarios:
 
 - Archivo: `backend/controllers/compraController.js`
 
-### 7.1 `guardarLibroComprado(req, res)` (1 libro)
-
-- Recibe:
-  - `req.body.id_libro`
-  - `req.id_usuario` (viene del middleware)
-- Comportamiento:
-  - Comprueba si ya existe la compra:
-    - `SELECT 1 FROM compra WHERE id_user = ? AND id_libro = ? LIMIT 1`
-  - Si existe:
-    - responde `200 { ok: true, duplicado: true }`
-  - Si no existe:
-    - inserta:
-      - `INSERT INTO compra (id_user, id_libro) VALUES (?, ?)`
-- Lo esencial:
-  - Es idempotente: repetir la misma compra no rompe el backend.
-
-### 7.2 `registrarCompraDesdeCarrito(req, res)` (desde carrito)
+### 7.1 `registrarCompraDesdeCarrito(req, res)` (desde carrito)
 
 - Busca los libros del carrito del usuario:
   - `SELECT id_libro FROM carrito WHERE id_user = ?`
@@ -230,11 +214,22 @@ El frontend distingue 2 escenarios:
   - responde `200 { ok: false, mensaje: "El carrito está vacío" }`
 - Si hay libros:
   - inicia transacción:
-    - por cada libro:
-      - si no existe en `compra`, inserta en `compra`
+    - por cada libro, intenta guardar en `compra`
+    - si el libro pertenece a un usuario (`librosusuario`), guarda también `id_user_libro`
   - hace `commit` o `rollback` si hay error
 - Lo esencial:
   - Guarda “lo que había en carrito” como compras del usuario.
+
+### 7.2 `registrarCompraLibros(req, res)` (lista enviada desde checkout)
+
+- Recibe:
+  - `req.body.libros` (array de IDs)
+- Comportamiento:
+  - Inicia transacción
+  - Recorre la lista y hace `INSERT INTO compra`
+  - Si el libro existe en `librosusuario`, incluye `id_user_libro`
+  - Elimina del carrito los IDs procesados
+  - Hace `commit` o `rollback`
 
 ### 7.3 Bug real que se corrigió
 

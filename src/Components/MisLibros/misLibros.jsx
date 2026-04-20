@@ -13,6 +13,7 @@ export default function MisLibros() {
     // Obtener datos del usuario al cargar
     useEffect(() => {
         obtenerLibrosUsuario();
+        obtenerLibrosPropiosComprados();
     }, []);
 
     const obtenerLibrosUsuario = async () => {
@@ -38,6 +39,30 @@ export default function MisLibros() {
             setCargando(false);
         }
     };
+
+    const obtenerLibrosPropiosComprados = async()=>{
+         try {
+            
+            // Obtener libros subidos por el usuario
+            const respuesta = await fetch("http://localhost:5000/librosUsuarioComprador", {
+                method: 'POST',
+                headers: {
+                    "Content-type": 'application/json', 
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            const datos = await respuesta.json();
+            if (datos.ok) {
+                setLibrosComprados(datos.filas?.length || 0);
+            }
+            setCargando(false);
+        } catch (error) {
+            toast.error("Error al obtener datos:", error);
+            setCargando(false);
+        }
+    }
+
 
 
     const crearLibro = async (e) => {
@@ -226,6 +251,7 @@ export default function MisLibros() {
             await crearLibro(e);
         }
     };
+
 
 
 

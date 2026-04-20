@@ -36,7 +36,7 @@ export default function Principal (){
         const nombre = (generoNombre || "").toLowerCase();
         let valor = "";
         if (nombre.includes("fantasia")) valor = "Fantasia";
-        else if (nombre.includes("ciencia")) valor = "Ciencia Ficcion ";
+        else if (nombre.includes("ciencia")) valor = "Ciencia ficción";
         else if (nombre.includes("misterio")) valor = "Misterio";
         else if (nombre.includes("programacion") || nombre.includes("programacion")) valor = "Programacion";
         if (!valor) return;

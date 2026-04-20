@@ -10,13 +10,20 @@ async function listarUsuarios(req, res){
 
     try{
         conexion = await conexionBD();
+        await conexion.beginTransaction();
 
         const [filas] = conexion.execute("SELECT * FROM usuarios")
+        await conexion.commit();
         res.status(200).json({
             ok: true,
             filas: filas
         })
     }catch(e){
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         res.status(400).json({ok:false, mensaje:"Error al listar los usuarios"})
     }
 }
@@ -31,6 +38,7 @@ async function listarUsuariosId(req, res){
 
     try{
         conexion = await conexionBD();
+        await conexion.beginTransaction();
 
         const [filasPorId] = await conexion.execute('SELECT * FROM usuarios where id_usuario = ?',
             [req.id_usuario]
@@ -38,14 +46,21 @@ async function listarUsuariosId(req, res){
         
 
         if(filasPorId.length === 0){
+            await conexion.commit();
             return res.status(404).json({ok:false, mensaje:"Usuario no encontrado"})
         }
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
             filas: filasPorId
         })
     }catch(e){
+       if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
        return res.status(500).json({ok:false, mensaje:"Error al listar los usuarios"})
     }
 };
@@ -76,6 +91,7 @@ async function cerrarSesion(req, res){
 
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         conexion = await conexionBD();
+        await conexion.beginTransaction();
 
         const [usuario] = await conexion.execute('SELECT token from usuarios where id_usuario = ? LIMIT 1', [decoded.id_usuario])
 
@@ -86,6 +102,7 @@ async function cerrarSesion(req, res){
             );
 
             if (resultado.affectedRows <= 0) {
+                await conexion.commit();
                 return res.status(404).json({
                     ok: false,
                     mensaje: 'No se ha podido cerrar sesión',
@@ -100,11 +117,17 @@ async function cerrarSesion(req, res){
         });
 
 
+        await conexion.commit();
         return res.status(200).json({
             ok: true,
         })
 
     }catch(e) {
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: false,

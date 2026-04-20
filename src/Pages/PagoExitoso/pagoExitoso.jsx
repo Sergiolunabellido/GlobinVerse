@@ -63,9 +63,9 @@ export default function PagoExitoso() {
             const checkoutLibros = checkoutLibrosRaw ? JSON.parse(checkoutLibrosRaw) : null;
 
             if (Array.isArray(checkoutLibros) && checkoutLibros.length > 0) {
+                const idsLibros = checkoutLibros.map(l => typeof l === 'object' ? l.id_libro : l);
                 const respuestaGuardar = await peticionProtegida('http://localhost:5000/registrarCompraLibros', {
-                    libros: checkoutLibros,
-                    paymentIntentId,
+                    libros: idsLibros,
                 });
                 const datosGuardar = await respuestaGuardar.json().catch(() => null);
 
@@ -73,18 +73,18 @@ export default function PagoExitoso() {
                     throw new Error(datosGuardar?.mensaje || 'Error al registrar la compra');
                 }
                 sessionStorage.removeItem('checkout_libros');
-                return;
-            }
+            } else {
+                const respuestaRegistrar = await peticionProtegida('http://localhost:5000/registrarCompraCarrito', {});
+                const datosRegistrar = await respuestaRegistrar.json().catch(() => ({ ok: false, mensaje: 'Error de conexión' }));
 
-            const respuestaRegistrar = await peticionProtegida('http://localhost:5000/registrarCompraCarrito', {
-                paymentIntentId,
-            });
-            const datosRegistrar = await respuestaRegistrar.json().catch(() => null);
+                console.log('Respuesta registrarCompraCarrito:', respuestaRegistrar.status, datosRegistrar);
 
-            if (!respuestaRegistrar.ok || datosRegistrar?.ok === false) {
-                throw new Error(datosRegistrar?.mensaje || 'Error al registrar la compra');
+                if (!respuestaRegistrar.ok || datosRegistrar?.ok === false) {
+                    throw new Error(datosRegistrar?.mensaje || 'Error al registrar la compra');
+                }
             }
         } catch (error) {
+            console.error('Error en registrarLibrosComprados:', error);
             if (claveRegistro) sessionStorage.removeItem(claveRegistro);
             throw error;
         } finally {
@@ -139,7 +139,7 @@ export default function PagoExitoso() {
                     }
                 }
             } else if (estadoRedireccion === 'processing') {
-                toast('El pago está siendo procesado...', { icon: '⏳' });
+                toast('El pago está siendo procesado...');
             } else {
                 setPagoExitoso(false);
                 toast.error('El pago no se pudo completar');

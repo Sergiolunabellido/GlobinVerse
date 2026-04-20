@@ -1,6 +1,6 @@
 # 📚 GoblinVerse (proyectode0) — Documentación Técnica Completa
 
-Fecha de documentación: 2026-03-17
+Fecha de documentación: 2026-04-15
 
 ## ✨ Resumen
 GoblinVerse es una aplicación full-stack para una librería fantástica. Incluye un frontend React con navegación SPA y renderizado 3D de portadas, y un backend Express con autenticación JWT (access + refresh), persistencia en MySQL y endpoints para usuarios, libros, favoritos, compras y carrito. El diseño visual se apoya en Tailwind CSS y estilos personalizados. La página del libro incluye lectura por voz de la descripción.
@@ -463,6 +463,41 @@ Todas las rutas usan método `POST`.
 - Body: vacío.
 - Respuesta ok: `{ ok: true, mensaje? }`.
 
+18. `POST /subirLibroPropio`
+- Auth: Bearer token.
+- Body: `{ titulo, autor, precio, descripcion, url_imagen, categoria, ... }`.
+- Respuesta ok: `{ ok: true, id_libro }`.
+
+19. `POST /librosUsuario`
+- Auth: Bearer token.
+- Body: vacío.
+- Respuesta ok: `{ ok: true, libros: [libros] }`.
+
+20. `POST /librosUsuarioComprador`
+- Auth: Bearer token.
+- Body: vacío.
+- Respuesta ok: `{ ok: true, filas: [compras] }`.
+
+21. `POST /eliminarLibroPropio`
+- Auth: Bearer token.
+- Body: `{ id_libro }`.
+- Respuesta ok: `{ ok: true, resultado }`.
+
+22. `POST /editarLibroPropio`
+- Auth: Bearer token.
+- Body: `{ id_libro, datos_actualizados }`.
+- Respuesta ok: `{ ok: true, resultado }`.
+
+23. `POST /registrarCompraLibros`
+- Auth: Bearer token.
+- Body: `{ libros: [] }`.
+- Respuesta ok: `{ ok: true, resultado }`.
+
+24. `POST /registrarCompraCarrito`
+- Auth: Bearer token.
+- Body: vacío.
+- Respuesta ok: `{ ok: true, insertados }`.
+
 ---
 
 ## 🧱 Modelo de Datos Inferido
@@ -501,6 +536,7 @@ Tablas deducidas a partir de consultas SQL en controllers.
   - `id_compra` (PK)
   - `id_user` (FK a `usuarios`)
   - `id_libro` (FK a `libros`)
+  - `id_user_libro` (FK opcional a `usuarios`; usado cuando se compra libro subido por usuario)
   - `fecha`
 
 - `carrito`

@@ -1,5 +1,10 @@
 const conexionBD = require('../config/db');
 
+/**
+ * Limpia y normaliza una lista de IDs de libros, eliminando duplicados y valores inválidos.
+ * @param {Array} lista - Array de IDs (puede contener strings o números)
+ * @returns {number[]} - Array de IDs válidos y únicos
+ */
 function normalizarIdsLibros(lista) {
   if (!Array.isArray(lista)) return [];
   const ids = [];
@@ -10,6 +15,12 @@ function normalizarIdsLibros(lista) {
   return [...new Set(ids)];
 }
 
+/**
+ * Consulta la base de datos para obtener información de libros por sus IDs.
+ * @param {Object} conexion - Conexión a la base de datos
+ * @param {number[]} idsLibros - Array de IDs de libros a buscar
+ * @returns {Promise<Array>} - Array con objetos de libros (id_libro, titulo, precio)
+ */
 async function obtenerLibrosPorIds(conexion, idsLibros) {
   const ids = normalizarIdsLibros(idsLibros);
   if (ids.length === 0) return [];
@@ -21,42 +32,14 @@ async function obtenerLibrosPorIds(conexion, idsLibros) {
   return Array.isArray(filas) ? filas : [];
 }
 
-async function guardarLibroComprado(req, res) {
-  const idLibro = req.body.id_libro;
-  const idUsuario = req.id_usuario;
-
-  let conexion;
-
-  try {
-    conexion = await conexionBD();
-
-    const [registroExistente] = await conexion.execute(
-      'SELECT 1 FROM compra WHERE id_user = ? AND id_libro = ? LIMIT 1',
-      [idUsuario, idLibro]
-    );
-
-    if (registroExistente && registroExistente.length > 0) {
-      await conexion.execute('DELETE FROM carrito WHERE id_user = ? AND id_libro = ?', [idUsuario, idLibro]);
-      return res.status(200).json({ ok: true, duplicado: true });
-    }
-
-    const [filas] = await conexion.execute('INSERT INTO compra (id_user, id_libro) VALUES (?,?)', [
-      idUsuario,
-      idLibro,
-    ]);
-
-    await conexion.execute('DELETE FROM carrito WHERE id_user = ? AND id_libro = ?', [idUsuario, idLibro]);
-
-    console.log('Se ha insertado el libro en compras del usuario: ', idUsuario);
-    return res.status(200).json({ ok: true, filas });
-  } catch (e) {
-    console.log('Error al insertar el libro en compras del usuario: ', req.id_usuario);
-    return res.status(500).json({ ok: false, mensaje: 'Error al guardar la compra' });
-  } finally {
-    if (conexion) await conexion.end();
-  }
-}
-
+/**
+ * Registra la compra de todos los libros que están en el carrito del usuario.
+ * Inserta cada libro en la tabla 'compra' (saltando los que ya existen),
+ * luego vacía el carrito. Usa transacción para garantizar consistencia.
+ * @param {Object} req - Request con id_usuario
+ * @param {Object} res - Response con ok y número de libros insertados
+ * @returns {JSON} - Respuesta con resultado de la operación
+ */
 async function registrarCompraDesdeCarrito(req, res) {
   const idUsuario = req.id_usuario;
 
@@ -74,20 +57,29 @@ async function registrarCompraDesdeCarrito(req, res) {
     );
 
     if (!filasCarrito || filasCarrito.length === 0) {
-      return res.status(200).json({ ok: false, mensaje: 'El carrito estÃ¡ vacÃ­o' });
+      return res.status(200).json({ ok: false, mensaje: 'El carrito esta vacio' });
     }
 
     await conexion.beginTransaction();
 
     for (const fila of filasCarrito) {
-      const [existe] = await conexion.execute('SELECT 1 FROM compra WHERE id_user = ? AND id_libro = ? LIMIT 1', [
-        idUsuario,
+    
+      //Compruebo si el id del libro pertenece a un usuario especifico. Si pertenece a un usuario, se inserta el id del usuario en la tabla compra, 
+      // sino se inserta sin el id del usuario.
+      const [idUserLibro] = await conexion.execute('SELECT id_user from librosusuario where id_libro = ? LIMIT 1', [
         fila.id_libro,
       ]);
 
-      if (existe && existe.length > 0) continue;
-
-      await conexion.execute('INSERT INTO compra (id_user, id_libro) VALUES (?,?)', [idUsuario, fila.id_libro]);
+      if (idUserLibro.length > 0) {
+        await conexion.execute('INSERT INTO compra (id_user, id_libro, id_user_libro) VALUES (?,?,?)', [
+          idUsuario,
+          fila.id_libro,
+          idUserLibro[0].id_user,
+        ]);
+      } else {
+        await conexion.execute('INSERT INTO compra (id_user, id_libro) VALUES (?,?)', [idUsuario, fila.id_libro]);
+      }
+    
     }
 
     await conexion.execute('DELETE FROM carrito WHERE id_user = ?', [idUsuario]);
@@ -108,12 +100,20 @@ async function registrarCompraDesdeCarrito(req, res) {
   }
 }
 
+/**
+ * Registra la compra de una lista específica de libros enviada en el body.
+ * Valida los IDs, consulta los libros existentes, inserta los no comprados
+ * en la tabla 'compra' y elimina los comprados del carrito.
+ * @param {Object} req - Request con id_usuario y libros: [id1, id2, ...]
+ * @param {Object} res - Response con ok y total de libros procesados
+ * @returns {JSON} - Respuesta con resultado de la operación
+ */
 async function registrarCompraLibros(req, res) {
   const idUsuario = req.id_usuario;
   const idsLibros = normalizarIdsLibros(req.body?.libros);
 
   if (idsLibros.length === 0) {
-    return res.status(400).json({ ok: false, mensaje: 'Lista de libros invÃ¡lida' });
+    return res.status(400).json({ ok: false, mensaje: 'Lista de libros invalida' });
   }
 
   let conexion;
@@ -121,22 +121,26 @@ async function registrarCompraLibros(req, res) {
   try {
     conexion = await conexionBD();
 
-    const libros = await obtenerLibrosPorIds(conexion, idsLibros);
-    if (!libros || libros.length === 0) {
-      return res.status(404).json({ ok: false, mensaje: 'No se han encontrado libros' });
-    }
-
     await conexion.beginTransaction();
 
     for (const idLibro of idsLibros) {
-      const [existe] = await conexion.execute('SELECT 1 FROM compra WHERE id_user = ? AND id_libro = ? LIMIT 1', [
-        idUsuario,
+    
+      //Compruebo si el id del libro pertenece a un usuario especifico. Si pertenece a un usuario, se inserta el id del usuario en la tabla compra, 
+      // sino se inserta sin el id del usuario.
+      const [idUserLibro] = await conexion.execute('SELECT id_user from librosusuario where id_libro = ? LIMIT 1', [
         idLibro,
       ]);
 
-      if (existe && existe.length > 0) continue;
-
-      await conexion.execute('INSERT INTO compra (id_user, id_libro) VALUES (?,?)', [idUsuario, idLibro]);
+      if (idUserLibro.length > 0) {
+        await conexion.execute('INSERT INTO compra (id_user, id_libro, id_user_libro) VALUES (?,?,?)', [
+          idUsuario,
+          idLibro,
+          idUserLibro[0].id_user,
+        ]);
+      } else {
+        await conexion.execute('INSERT INTO compra (id_user, id_libro) VALUES (?,?)', [idUsuario, idLibro]);
+      }
+    
     }
 
     const placeholders = idsLibros.map(() => '?').join(',');
@@ -162,7 +166,7 @@ async function registrarCompraLibros(req, res) {
 }
 
 module.exports = {
-  guardarLibroComprado,
+
   registrarCompraDesdeCarrito,
   registrarCompraLibros,
 };

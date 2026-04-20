@@ -59,7 +59,7 @@ El objetivo es tener una base sólida para evolucionar hacia una **librería onl
 
 ---
 
-## 🆕 Novedades recientes (2026-03-18)
+## 🆕 Novedades recientes (2026-04-15)
 
 - **Página Sobre Nosotros** completa con historia, misión, visión y valores.
 - **Página Contacto** con email (redirige a Gmail), teléfono, dirección, redes sociales y horario.
@@ -69,6 +69,8 @@ El objetivo es tener una base sólida para evolucionar hacia una **librería onl
 - **Tests implementados**: login, header, utils, funtionGenres y cerrarSesion.
 - **Responsive mejorado** en catálogo, perfil y páginas nuevas.
 - **Navegación por géneros** desde la home al catálogo filtrado.
+- **Gestión de libros propios**: subida, edición, eliminación de libros por parte del usuario.
+- **Historial de compras**: visualización de libros comprados.
 
 ---
 
@@ -222,6 +224,8 @@ En `App.js` se definen las rutas:
 - `/carrito` → `Carrito`.
 - `/sobreNosotros` → `SobreNosotros`.
 - `/contacto` → `Contacto`.
+- `/checkout` → `Checkout`.
+- `/pago-exitoso` → `PagoExitoso`.
 
 <a id="pagina-principal"></a>
 ### Pagina Principal (`/`)
@@ -396,13 +400,19 @@ Archivo: `backend/routes/auth.js`
 - `POST /anadirLibroCarrito` → añadir al carrito (**protegida**).
 - `POST /librosCarrito` → ver carrito (**protegida**).
 - `POST /eliminarLibroCarrito` → eliminar del carrito (**protegida**).
-- `POST /guardarLibroCarrito` → registrar compra de un libro (**protegida**).
 - `POST /registrarCompraCarrito` → registrar compras desde carrito (**protegida**).
 - `POST /cerrarSesion` → invalida refresh token y limpia cookie.
+- `POST /subirLibroPropio` → subir libro propio (**protegida**).
+- `POST /librosUsuario` → libros subidos por el usuario (**protegida**).
+- `POST /librosUsuarioComprador` → libros comprados por el usuario (**protegida**).
+- `POST /eliminarLibroPropio` → eliminar libro propio (**protegida**).
+- `POST /editarLibroPropio` → editar libro propio (**protegida**).
+- `POST /registrarCompraLibros` → registrar compra de varios libros (**protegida**).
 
 Archivo: `backend/routes/pagos.js`
 
 - `POST /api/pagos/intentoPago` → crea un `PaymentIntent` y devuelve `client_secret`.
+- `POST /api/pagos/actualizarIntentoPago` → actualiza email/metadata del `PaymentIntent`.
 
 <a id="middleware-de-autenticacion"></a>
 ### Middleware de autenticacion
@@ -475,6 +485,7 @@ Basado en las consultas reales del backend, el proyecto usa al menos estas tabla
 - `id_compra` (PRIMARY KEY)
 - `id_user` (FK a `usuarios.id_usuario`)
 - `id_libro` (FK a `libros.id_libro`)
+- `id_user_libro` (FK opcional a `usuarios.id_usuario`, usado para libros subidos por usuarios)
 - `fecha`
 
 ### `carrito`

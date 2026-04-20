@@ -16,6 +16,7 @@ async function añadirLibroCarrito(req, res){
 
     try{
         conexion = await conexionBD();
+        await conexion.beginTransaction();
 
         const [registroExistente] = await conexion.execute(
             "SELECT * FROM carrito WHERE id_user = ? AND id_libro = ? LIMIT 1",
@@ -23,6 +24,7 @@ async function añadirLibroCarrito(req, res){
         )
 
         if (registroExistente.length > 0) {
+            await conexion.commit();
             return res.json({
                 ok: false,
                 mensaje: "El libro ya existe en el carrito"
@@ -31,8 +33,14 @@ async function añadirLibroCarrito(req, res){
 
         const [filas] = await conexion.execute("Insert into carrito (id_user, id_libro) values (?,?)", [idUsuario, idLibro])
         console.log("Se ha insertado el libro en el carrito del usuario: ", idUsuario);
+        await conexion.commit();
         return res.status(200).json({ ok: true, filas });
     }catch(e){
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.log("Error al insertar el libro en el carrito del usuario: ", req.id_usuario)
         return res.status(500).json({ ok: false, mensaje: "Error al añadir el libro al carrito" });
     } finally {
@@ -56,6 +64,7 @@ async function librosCarrito(req, res) {
     try{
 
         conexion = await conexionBD();
+        await conexion.beginTransaction();
 
         const [libros] = await conexion.execute(
             `SELECT l.* FROM libros l
@@ -65,18 +74,25 @@ async function librosCarrito(req, res) {
         );
 
         if(libros.length === 0){
+            await conexion.commit();
             return res.json({
                 ok: false,
                 mensaje: "No se han encontrado libros para este usuario"
             });
         }
 
+        await conexion.commit();
         return res.json({
             ok: true,
             libros: libros
         })
 
     }catch(e){
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.log("Error al recoger los libros del carrito del usuario: ", req.id_usuario)
         return res.status(500).json({ ok: false, mensaje: "Error al recoger los libros del carrito" });
     } finally {
@@ -102,13 +118,20 @@ async function eliminarLibroCarrito(req, res){
 
     try{
         conexion = await conexionBD();
+        await conexion.beginTransaction();
         const [resultado] = await conexion.execute(
             "DELETE FROM carrito WHERE id_user = ? AND id_libro = ?",
             [idUsuario, idLibro]
         );
 
+        await conexion.commit();
         return res.status(200).json({ ok: true, resultado });
     }catch(e){
+        if (conexion) {
+            try {
+                await conexion.rollback();
+            } catch (_) {}
+        }
         console.log("Error al eliminar el libro del carrito del usuario: ", req.id_usuario)
         return res.status(500).json({ ok: false, mensaje: "Error al eliminar el libro del carrito" });
     } finally {

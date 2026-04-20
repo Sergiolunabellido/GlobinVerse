@@ -20,14 +20,14 @@ router.post('/intentoPago', async (req, res) => {
   try {
     const stripe = getStripe();
     if (!stripe) {
-      return res.status(500).json({ error: 'Stripe no estÃ¡ configurado (falta STRIPE_SECRET_KEY)' });
+      return res.status(500).json({ error: 'Stripe no esta configurado (falta STRIPE_SECRET_KEY)' });
     }
 
     const { monto, moneda = 'eur' } = req.body;
     const montoEnCentimos = Math.round(Number(monto) * 100);
 
     if (!Number.isFinite(montoEnCentimos) || montoEnCentimos <= 0) {
-      return res.status(400).json({ error: 'Monto invÃ¡lido' });
+      return res.status(400).json({ error: 'Monto invalido' });
     }
 
     const intentoPago = await stripe.paymentIntents.create({
@@ -51,18 +51,18 @@ router.post('/actualizarIntentoPago', async (req, res) => {
   try {
     const stripe = getStripe();
     if (!stripe) {
-      return res.status(500).json({ ok: false, error: 'Stripe no estÃ¡ configurado (falta STRIPE_SECRET_KEY)' });
+      return res.status(500).json({ ok: false, error: 'Stripe no esta configurado (falta STRIPE_SECRET_KEY)' });
     }
 
     const { paymentIntentId, correo, telefono, nombre } = req.body || {};
 
     if (typeof paymentIntentId !== 'string' || !paymentIntentId.startsWith('pi_')) {
-      return res.status(400).json({ ok: false, error: 'paymentIntentId invÃ¡lido' });
+      return res.status(400).json({ ok: false, error: 'paymentIntentId invalido' });
     }
 
     const correoLimpio = typeof correo === 'string' ? correo.trim() : '';
     if (correoLimpio && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)) {
-      return res.status(400).json({ ok: false, error: 'Correo invÃ¡lido' });
+      return res.status(400).json({ ok: false, error: 'Correo invalido' });
     }
 
     const metadata = {};
